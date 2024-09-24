@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.PillPop_Doctor" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Tema base personalizado con el color turquesa -->
+    <style name="Base.Theme.PillPop_Doctor" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Personaliza el tema claro aquí -->
+        <item name="colorPrimary">@color/colorTurquesa</item>
+        <item name="colorPrimaryVariant">@color/colorTurquesaDark</item>
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorOnPrimary">@android:color/white
+        </item> <!-- Texto y elementos sobre el color primario -->
+        <item name="colorOnSecondary">@android:color/black
+        </item> <!-- Texto sobre el color secundario -->
+
+        <!-- Fondo general de la app -->
+        <item name="android:windowBackground">@android:color/white</item>
+
+        <!-- Personalización de la barra de estado -->
+        <item name="android:statusBarColor">@color/gris_tab</item>
+
+        <!-- Botones flotantes y otros controles con color acento -->
+        <item name="floatingActionButtonStyle">@style/CustomFloatingActionButton</item>
+    </style>
+
+    <!-- Tema principal que extiende el base -->
+    <style name="Theme.PillPop_Doctor" parent="Base.Theme.PillPop_Doctor">
+        <!-- Puedes agregar más personalizaciones aquí si lo deseas -->
+    </style>
+
+    <!-- Estilo personalizado para el botón flotante -->
+    <style name="CustomFloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <!-- Color de fondo personalizado para el FAB -->
+        <item name="backgroundTint">@color/colorTurquesa</item>
+        <!-- Color del icono en el FAB -->
+        <item name="rippleColor">@color/colorTurquesaDark</item>
+        <!-- Sombra o elevación del botón flotante -->
+        <item name="elevation">6dp</item>
+        <!-- Tamaño del botón flotante (puedes cambiar a 'normal' o 'mini') -->
+        <item name="fabSize">normal</item>
+        <!-- Color del ícono del FAB -->
+        <item name="tint">@android:color/white</item>
+    </style>
+
 </resources>

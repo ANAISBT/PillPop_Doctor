@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="bounding_box_color">#234567</color>
+    <color name="gray">#999</color>
+    <color name="grisClaro">#D9D9D9</color>
+    <color name="azulTexto">#00507A</color>
+    <color name="orange">#F93</color>
+    <color name="gris_tab">#323233</color>
+    <color name="colorTurquesa">#1FB6C1</color> <!-- Color turquesa personalizado -->
+    <color name="colorTurquesaDark">#198D99</color> <!-- Variante más oscura de turquesa -->
+    <color name="colorAccent">#33CED8</color> <!-- Acento más claro derivado de turquesa -->
+
 </resources>

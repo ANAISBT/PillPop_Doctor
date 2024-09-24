@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Hoy"
+        android:id="@+id/Hoy"
+        android:icon="@drawable/baseline_home_24"
+        android:iconTint="@color/white"
+        android:titleTextColor="@color/white"/>
+
+    <item android:title="Progreso"
+        android:id="@+id/progreso"
+        android:icon="@drawable/progreso"
+        android:iconTint="@color/white"
+        android:titleTextColor="@color/white"/>
+
+    <item android:title="Perfil"
+        android:id="@+id/perfil"
+        android:icon="@drawable/perfil"
+        android:iconTint="@color/white"
+        android:titleTextColor="@color/white"/>
+</menu>
