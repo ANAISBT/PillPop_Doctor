@@ -37,6 +37,9 @@
             android:exported="false" />
         <activity
             android:name=".HomeView"
+            android:exported="false" />
+        <activity
+            android:name=".EditarPerfilView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

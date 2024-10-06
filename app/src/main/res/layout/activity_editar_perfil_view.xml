@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/EmpezarTomaBtn"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditarPerfilView"
+    android:background="#29282B">
+
+    <LinearLayout
+        android:id="@+id/EditarPerfilNav"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@drawable/grismedio_bg"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/TextEditPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-black"
+                android:text="Editar Perfil"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/EditarPerfilNav"
+        app:layout_constraintBottom_toTopOf="@id/linearLayoutButton"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="2dp">
+
+        <LinearLayout
+            android:id="@+id/DatosPerfilEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nombreCompletoEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Nombre de la Pastilla"
+                android:textAppearance="@style/Labels" />
+
+            <EditText
+                android:id="@+id/nombreCompletoEditInput"
+                style="@style/Inputs"
+                android:layout_width="335dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="#1FB5C0"
+                android:ems="10"
+                android:inputType="text"
+                android:text=""
+                android:textColor="#721FB5C0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.506"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/DNIlabel" />
+
+            <TextView
+                android:id="@+id/GeneroEditText"
+                style="@style/Labels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Género"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.107"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/nombreCompletoEditInput" />
+
+            <Spinner
+                android:id="@+id/generosEditDrop"
+                android:layout_width="335dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="#1FB5C0"
+                android:textColor="#1FB5C0"
+                android:lineSpacingExtra="5dp"
+                android:padding="5dp"
+                android:layout_margin="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.526"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/GeneroEditText" />
+
+            <TextView
+                android:id="@+id/DNIEditText"
+                style="@style/Labels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="DNI"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.122"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/DNIInput" />
+
+            <EditText
+                android:id="@+id/DNIEditInput"
+                style="@style/Inputs"
+                android:layout_width="335dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="#1FB5C0"
+                android:text=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.526"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/DNIEditText" />
+
+            <TextView
+                android:id="@+id/EspecialidadEditText"
+                style="@style/Labels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Especialidad"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.122"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/DNIInput" />
+
+            <Spinner
+                android:id="@+id/EspecialidadEditDrop"
+                android:layout_width="335dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="#1FB5C0"
+                android:padding="5dp"
+                android:layout_margin="5dp"
+                android:textColor="#1FB5C0"
+                android:lineSpacingExtra="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.513"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/EspecialidadEditText" />
+
+            <TextView
+                android:id="@+id/CorreoEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Correo Electrónico"
+                android:textAppearance="@style/Labels"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.138"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/EspecialidadDrop" />
+
+            <EditText
+                android:id="@+id/EmailAddressEditInput"
+                style="@style/Inputs"
+                android:layout_width="335dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="#1FB5C0"
+                android:text=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.513"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/CorreoEditText" />
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutButton"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_horizontal|fill_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/EditarPerfilButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button_turquesa"
+            android:text="Editar" />
+
+        <Button
+            android:id="@+id/CancelarEditBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_button_gris"
+            android:text="Cancelar" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
