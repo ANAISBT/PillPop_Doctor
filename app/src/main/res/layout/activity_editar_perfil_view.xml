@@ -72,7 +72,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.506"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/DNIlabel" />
+                app:layout_constraintTop_toBottomOf="@id/nombreCompletoEdit" />
 
             <TextView
                 android:id="@+id/GeneroEditText"
@@ -167,7 +167,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.138"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/EspecialidadDrop" />
+                app:layout_constraintTop_toBottomOf="@id/EspecialidadEditDrop" />
 
             <EditText
                 android:id="@+id/EmailAddressEditInput"

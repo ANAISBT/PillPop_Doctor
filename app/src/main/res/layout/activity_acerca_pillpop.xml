@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AcercaPillPop"
+    android:background="#29282B">
+
+    <LinearLayout
+        android:id="@+id/AcercaPillpopNav"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@drawable/grismedio_bg"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center|center_horizontal|center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/AcercaPillpopRetoceder"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/grismedio_bg"
+                    android:paddingLeft="20dp"
+                    app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
+
+                <TextView
+                    android:id="@+id/TextAcercaPillpop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Acerca PillPop"
+                    android:textColor="@color/white"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/AcercaPillpopNav"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="2dp">
+
+        <LinearLayout
+            android:id="@+id/DatosDetallePrescripcion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="260dp"
+                android:layout_height="176dp"
+                android:layout_gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/logo2" />
+
+            <TextView
+                android:id="@+id/Info1label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="¿Qué es PillPop?"
+                android:textColor="#1FB5C0"/>
+
+            <TextView
+                android:id="@+id/Info1Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-light"
+                android:text="PillPop es una aplicación diseñada para ayudarte a gestionar y verificar la ingesta de tus medicamentos de manera fácil y precisa. Con su tecnología avanzada de reconocimiento mediante cámara, PillPop garantiza que tomes tus medicamentos en el momento correcto y de la forma adecuada."
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/Info2label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Nuestro Objetivo"
+                android:textColor="#1FB5C0" />
+
+            <TextView
+                android:id="@+id/Info2Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Facilitar el control de la medicación diaria a través de soluciones tecnológicas que mejoran la salud y el bienestar, asegurando que nunca pierdas una dosis de tu tratamiento."
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/Info3label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Contacto y Soporte"
+                android:textColor="#1FB5C0" />
+
+            <TextView
+                android:id="@+id/Info3Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Si tienes dudas o necesitas asistencia, escribenos a los siguientes correos:"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+            <TextView
+                android:id="@+id/Corre1Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="sans-serif-light"
+                android:text="bianca.romero@unmsm.edu.pe"
+                android:textColor="#1FB5C0"
+                android:textSize="16dp" />
+            <TextView
+                android:id="@+id/Correo2ext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="sans-serif-light"
+                android:text="anais.bustamante@unmsm.edu.pe"
+                android:textColor="#1FB5C0"
+                android:textSize="16dp" />
+            <TextView
+                android:id="@+id/Info4Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Estamos disponibles para ayudarte y mejorar tu experiencia con PillPop."
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
