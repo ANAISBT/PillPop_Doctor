@@ -27,13 +27,16 @@
             android:name=".InicioView"
             android:exported="false" />
         <activity
-            android:name=".HomeView"
+            android:name=".LoginView"
             android:exported="false" />
         <activity
             android:name=".RegisterView"
             android:exported="false" />
         <activity
             android:name=".DetallePastillaView"
+            android:exported="false" />
+        <activity
+            android:name=".HomeView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

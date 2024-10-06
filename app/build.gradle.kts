@@ -85,4 +85,7 @@ dependencies {
 
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
+    //Conexión con la BD
+    implementation("com.android.volley:volley:1.2.1")
+
 }

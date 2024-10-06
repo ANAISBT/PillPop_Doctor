@@ -22,6 +22,11 @@
         <item>AM</item>
         <item>PM</item>
     </string-array>
+    <string-array name="frecuencia_reporte_array">
+        <item>Seleccionar...</item>
+        <item>Diario</item>
+        <item>Entre Fechas</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

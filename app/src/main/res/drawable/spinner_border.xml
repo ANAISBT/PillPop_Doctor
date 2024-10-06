@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/gris_tab"/> <!-- Color de fondo -->
+    <stroke
+        android:width="0.5dp"
+        android:color="#1FB5C0"/> <!-- Color y grosor del borde -->
+    <corners android:radius="10dp"/> <!-- Radio de las esquinas -->
+</shape>
