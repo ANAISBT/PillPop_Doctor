@@ -1,11 +1,15 @@
 package com.example.pillpop_doctor
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class RegisterView: AppCompatActivity() {
+    private lateinit var btnRegistrar: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_view)
@@ -22,6 +26,13 @@ class RegisterView: AppCompatActivity() {
         spinnerGenero.adapter = adapterGeneros
         spinnerEspecialidad.adapter = adapterEspecialidad
 
+        btnRegistrar = findViewById(R.id.Registrarse_btn)
+
+        btnRegistrar.setOnClickListener {
+
+            val intent = Intent(this, BienvenidoView::class.java)
+            startActivity(intent)
+        }
 
 
     }
