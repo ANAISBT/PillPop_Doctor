@@ -9,6 +9,5 @@ data class Pastilla(
  val Frecuencia: String,
  val fechaInicio: String,
  val hora: String,
- val tiempo: String,
  val observaciones: String
 ) : Serializable

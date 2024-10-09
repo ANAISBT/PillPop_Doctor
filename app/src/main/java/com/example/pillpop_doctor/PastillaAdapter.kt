@@ -31,7 +31,6 @@ class PastillaAdapter(private val pastillasList: List<Pastilla>) : RecyclerView.
         private var frecuenciaText: TextView = itemView.findViewById(R.id.Fecuencia)
         private var fechaInicioText: TextView = itemView.findViewById(R.id.fechaNumero)
         private var horaText: TextView = itemView.findViewById(R.id.horaNumero)
-        private var tiempoText: TextView = itemView.findViewById(R.id.Tiempo)
         private var observacionesText: TextView = itemView.findViewById(R.id.ObservacionesText)
 
         fun bind(pastilla: Pastilla) {
@@ -41,7 +40,6 @@ class PastillaAdapter(private val pastillasList: List<Pastilla>) : RecyclerView.
             frecuenciaText.text = pastilla.Frecuencia
             fechaInicioText.text = pastilla.fechaInicio
             horaText.text = pastilla.hora
-            tiempoText.text = pastilla.tiempo
             observacionesText.text = pastilla.observaciones
         }
     }

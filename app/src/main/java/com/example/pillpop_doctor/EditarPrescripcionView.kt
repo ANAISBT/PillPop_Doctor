@@ -28,7 +28,6 @@ class EditarPrescripcionView : AppCompatActivity() {
                 Frecuencia = "Cada 8 horas",
                 fechaInicio = "21/09/2024",
                 hora = "08:00",
-                tiempo = "AM",
                 observaciones = "Tomar con alimentos"
             ),
             Pastilla(
@@ -39,7 +38,6 @@ class EditarPrescripcionView : AppCompatActivity() {
                 Frecuencia = "Cada 6 horas",
                 fechaInicio = "22/09/2024",
                 hora = "09:00",
-                tiempo = "AM",
                 observaciones = "Evitar tomar en ayunas"
             ),
             Pastilla(
@@ -50,7 +48,6 @@ class EditarPrescripcionView : AppCompatActivity() {
                 Frecuencia = "Cada 12 horas",
                 fechaInicio = "23/09/2024",
                 hora = "10:00",
-                tiempo = "AM",
                 observaciones = "Completar el tratamiento"
             ),
             Pastilla(
@@ -61,7 +58,6 @@ class EditarPrescripcionView : AppCompatActivity() {
                 Frecuencia = "Cada 24 horas",
                 fechaInicio = "24/09/2024",
                 hora = "08:00",
-                tiempo = "AM",
                 observaciones = "Tomar en ayunas"
             )
         )
