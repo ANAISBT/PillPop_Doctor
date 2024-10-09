@@ -18,13 +18,13 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".DetallePrescripcionView"
+            android:name=".DetallePastillaView"
             android:exported="false" />
         <activity
             android:name=".BienvenidoView"
             android:exported="false" />
         <activity
-            android:name=".InicioView"
+            android:name=".EditarPerfilView"
             android:exported="false" />
         <activity
             android:name=".LoginView"
@@ -33,13 +33,17 @@
             android:name=".RegisterView"
             android:exported="false" />
         <activity
-            android:name=".DetallePastillaView"
+            android:name=".DetallePrescripcionView"
             android:exported="false" />
         <activity
             android:name=".HomeView"
             android:exported="false" />
         <activity
-            android:name=".EditarPerfilView"
+            android:name=".EditarPrescripcionView"
+            android:exported="false" />
+
+        <activity
+            android:name=".InicioView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
