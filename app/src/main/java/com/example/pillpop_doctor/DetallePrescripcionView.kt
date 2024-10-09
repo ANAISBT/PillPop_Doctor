@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,8 @@ class DetallePrescripcionView : AppCompatActivity() {
 
     private lateinit var listPastillas: RecyclerView
     private lateinit var adapterpastilla: PastillaAdapter
+    private val pastillasList: MutableList<Pastilla> = mutableListOf()
+    private lateinit var agregarPrescripcionButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,63 +30,35 @@ class DetallePrescripcionView : AppCompatActivity() {
         anadirPastillaButton.setOnClickListener {
             // Create an Intent to navigate to DetallePastillavIEW
             val intent = Intent(this, DetallePastillaView::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_CODE_ADD_PASTILLA)
         }
 
         listPastillas = findViewById(R.id.ListPastillas)
         listPastillas.layoutManager = LinearLayoutManager(this)
 
-        // Inicializar lista de pastillas con datos ajustados
-        val pastillasList: List<Pastilla> = listOf(
-            Pastilla(
-                pastillla_id = 1,
-                pastilla_nombre = "Paracetamol",
-                cantidad = 50,
-                dosis = 2,
-                Frecuencia = "Cada 8 horas",
-                fechaInicio = "21/09/2024",
-                hora = "08:00",
-                tiempo = "AM",
-                observaciones = "Tomar con alimentos"
-            ),
-            Pastilla(
-                pastillla_id = 2,
-                pastilla_nombre = "Ibuprofeno",
-                cantidad = 30,
-                dosis = 1,
-                Frecuencia = "Cada 6 horas",
-                fechaInicio = "22/09/2024",
-                hora = "09:00",
-                tiempo = "AM",
-                observaciones = "Evitar tomar en ayunas"
-            ),
-            Pastilla(
-                pastillla_id = 3,
-                pastilla_nombre = "Amoxicilina",
-                cantidad = 20,
-                dosis = 1,
-                Frecuencia = "Cada 12 horas",
-                fechaInicio = "23/09/2024",
-                hora = "10:00",
-                tiempo = "AM",
-                observaciones = "Completar el tratamiento"
-            ),
-            Pastilla(
-                pastillla_id = 4,
-                pastilla_nombre = "Aspirina",
-                cantidad = 10,
-                dosis = 1,
-                Frecuencia = "Cada 24 horas",
-                fechaInicio = "24/09/2024",
-                hora = "08:00",
-                tiempo = "AM",
-                observaciones = "Tomar en ayunas"
-            )
-        )
-
-        // Inicializar el adaptador con la lista
+        // Inicializar el adaptador con la lista mutable
         adapterpastilla = PastillaAdapter(pastillasList)
         listPastillas.adapter = adapterpastilla
+
+        agregarPrescripcionButton = findViewById(R.id.aceptarButton)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_ADD_PASTILLA && resultCode == RESULT_OK) {
+            // Obtener datos desde el intent
+            val nuevaPastilla = data?.getParcelableExtra<Pastilla>("nueva_pastilla")
+            nuevaPastilla?.let {
+                // Añadir la nueva pastilla a la lista
+                pastillasList.add(it)
+                adapterpastilla.notifyDataSetChanged()
+            }
+        }
+    }
+
+    companion object {
+        const val REQUEST_CODE_ADD_PASTILLA = 1
     }
 }
 

@@ -1,6 +1,7 @@
 package com.example.pillpop_doctor
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
@@ -78,11 +79,6 @@ class DetallePastillaView : AppCompatActivity() {
 
 
         btnAceptar.setOnClickListener {
-
-           /* val frecuenciaSeleccionada = spinnerFrecuencia.selectedItem.toString()
-
-            val idFrecuencia = frecuenciasMap[frecuenciaSeleccionada]
-*/
             obtenerDatos()
         }
     }
@@ -90,8 +86,8 @@ class DetallePastillaView : AppCompatActivity() {
     private fun obtenerDatos() {
         // Obtén los datos ingresados
         val nombrePastilla = nombrePastillaInput.text.toString()
-        val cantidadPastillas = cantidadPastillasInput.text.toString()
-        val dosis = dosisInput.text.toString()
+        val cantidadPastillas = cantidadPastillasInput.text.toString().toIntOrNull() ?: 0
+        val dosis = dosisInput.text.toString().toIntOrNull() ?: 0
         val fechaInicio = fechaInicioInput.text.toString()
         val horaDosis = horaDosisInput.text.toString()
         val minutosDosis = minutosDosisInput.text.toString()
@@ -101,6 +97,26 @@ class DetallePastillaView : AppCompatActivity() {
 
         // Aquí puedes hacer algo con los datos, como enviarlos a una base de datos o mostrarlos
         Log.d("DetallePrescripcion", "Nombre Pastilla: $nombrePastilla, Cantidad: $cantidadPastillas, Dosis: $dosis, Fecha: $fechaInicio, Hora: $horaDosis, Minutos: $minutosDosis, Observaciones: $observaciones")
+        // Crear el objeto Pastilla
+        val nuevaPastilla = idFrecuencia?.let {
+            Pastilla(
+                pastillla_id = 0, // Asignar un id temporal
+                pastilla_nombre = nombrePastilla,
+                cantidad = cantidadPastillas,
+                dosis = dosis,
+                FrecuenciaId = it,
+                Frecuencia = frecuenciaSeleccionada,
+                fechaInicio = fechaInicio,
+                hora = horaDosis,
+                observaciones = observaciones
+            )
+        }
+
+        // Regresar los datos a la actividad DetallePrescripcionView
+        val intent = Intent()
+        intent.putExtra("nueva_pastilla", nuevaPastilla)
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
     private fun actualizarFecha(calendar: Calendar) {
