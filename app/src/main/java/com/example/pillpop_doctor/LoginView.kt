@@ -37,23 +37,17 @@ class LoginView : AppCompatActivity() {
         edtDni = findViewById(R.id.DNIInput)
         edtContrasena = findViewById(R.id.TextPasswordInput)
         btnLogin = findViewById(R.id.IniciarSesionBtn)
+        btnRegistrarUsuario = findViewById(R.id.btnRegistrarUsuario)
 
         btnLogin.setOnClickListener {
-            /*val dni = edtDni.text.toString()
+            val dni = edtDni.text.toString()
             val contrasena = edtContrasena.text.toString()
-            LoginTask(dni, contrasena) { perfilId ->
-                if (perfilId != null) {
-                    // Login exitoso, redirigir al PrincipalView
-                    val intent = Intent(this, BienvenidoView::class.java)
-                    intent.putExtra("perfil_id", perfilId)
-                    startActivity(intent)
-                } else {
-                    // Mostrar mensaje de error al usuario
-                    Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
-                }
-            }.execute()*/
-            val intent = Intent(this, BienvenidoView::class.java)
-            startActivity(intent)
+
+            if (dni.isNotEmpty() && contrasena.isNotEmpty()) {
+                iniciarSesion(dni, contrasena)
+            } else {
+                Toast.makeText(this, "Por favor, ingresa DNI y contraseña", Toast.LENGTH_SHORT).show()
+            }
         }
         btnRegistrarUsuario.setOnClickListener{
             val intent = Intent(this, RegisterView::class.java)
@@ -61,56 +55,51 @@ class LoginView : AppCompatActivity() {
         }
     }
 
-    /*private class LoginTask(
-        private val dni: String,
-        private val contrasena: String,
-        private val onLoginComplete: (Int?) -> Unit
-    ) : AsyncTask<Void, Void, String>() {
+    private fun iniciarSesion(dni: String, contrasena: String) {
+        val queue = Volley.newRequestQueue(this)
+        val url = "https://pillpop-backend.onrender.com/loginDoctor"
 
-        override fun doInBackground(vararg params: Void?): String {
-            val urlString = "http://192.168.56.1/PillPop/API/Doctor/LoginUsuarioDoctor.php"
-            var result = ""
+        // Crear los datos JSON para enviar en el body
+        val jsonBody = JSONObject()
+        jsonBody.put("p_dni", dni)
+        jsonBody.put("p_contrasena", contrasena)
 
-            try {
-                val url = URL(urlString)
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "POST"
-                connection.setRequestProperty("Content-Type", "application/json; utf-8")
-                connection.doOutput = true
+        // Crear la solicitud POST
+        val request = JsonObjectRequest(
+            Request.Method.POST, url, jsonBody,
+            { response ->
+                try {
+                    val mensaje = response.getString("mensaje")
+                    if (mensaje == "Login exitoso") {
+                        val doctorId = response.getInt("id")
+                        Toast.makeText(this, "Login exitoso, ID: $doctorId", Toast.LENGTH_SHORT).show()
 
-                // Enviar datos
-                val jsonInputString = """{"dni": $dni, "contrasena": "$contrasena"}"""
-                connection.outputStream.use { os ->
-                    val input = jsonInputString.toByteArray()
-                    os.write(input, 0, input.size)
+                        // Navegar a la vista de bienvenida o la siguiente pantalla
+                        val intent = Intent(this, BienvenidoView::class.java)
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Error en la respuesta: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
-
-                // Leer la respuesta
-                result = connection.inputStream.bufferedReader().use { it.readText() }
-            } catch (e: Exception) {
-                Log.e("LoginTask", "Error", e)
-            }
-
-            return result
-        }
-
-        override fun onPostExecute(result: String) {
-            super.onPostExecute(result)
-            try {
-                val jsonResponse = JSONObject(result)
-                if (jsonResponse.has("id")) {
-                    val perfilId = jsonResponse.getInt("id")
-                    onLoginComplete(perfilId)
+            },
+            { error ->
+                if (error.networkResponse != null) {
+                    val statusCode = error.networkResponse.statusCode
+                    val errorMsg = String(error.networkResponse.data)
+                    Log.e("VolleyError", "Error code: $statusCode, Error message: $errorMsg")
+                    Toast.makeText(this, "Error en el servidor: $statusCode", Toast.LENGTH_LONG).show()
                 } else {
-                    // Manejar el error, por ejemplo, mostrar un mensaje
-                    val error = jsonResponse.getString("mensaje")
-                    Log.e("LoginTask", "Login error: $error")
-                    onLoginComplete(null)
+                    Log.e("VolleyError", "Error: ${error.message}")
+                    Toast.makeText(this, "Error de conexión: ${error.message}", Toast.LENGTH_LONG).show()
                 }
-            } catch (e: Exception) {
-                Log.e("LoginTask", "Error parsing JSON", e)
-                onLoginComplete(null)
             }
-        }
-    }*/
+        )
+
+        // Añadir la solicitud a la cola de Volley
+        queue.add(request)
+    }
+
+
 }
