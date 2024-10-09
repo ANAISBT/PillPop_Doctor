@@ -1,9 +1,11 @@
 package com.example.pillpop_doctor
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +19,16 @@ class DetallePrescripcionView : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle_prescripcion)
+
+        // Find the button by ID
+        val anadirPastillaButton: ImageButton = findViewById(R.id.AnadirPastilla)
+
+        // Set OnClickListener to navigate to DetallePastillavIEW
+        anadirPastillaButton.setOnClickListener {
+            // Create an Intent to navigate to DetallePastillavIEW
+            val intent = Intent(this, DetallePastillaView::class.java)
+            startActivity(intent)
+        }
 
         listPastillas = findViewById(R.id.ListPastillas)
         listPastillas.layoutManager = LinearLayoutManager(this)
