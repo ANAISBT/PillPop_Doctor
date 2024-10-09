@@ -162,7 +162,8 @@ class RegisterView: AppCompatActivity() {
                 // Manejar la respuesta exitosa
                 try {
                     val mensaje = response.getString("mensaje")
-                    Log.d("Registro", mensaje)
+                    doctorId = response.getInt("idUsuarioDoctor")
+                    Log.d("Registro", "$mensaje con ID: $idDoctor")
                     // Redirigir al usuario a la vista de bienvenida
                     val intent = Intent(this, BienvenidoView::class.java)
                     startActivity(intent)
