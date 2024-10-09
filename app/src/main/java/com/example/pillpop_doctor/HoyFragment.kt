@@ -11,6 +11,11 @@ import android.widget.SearchView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.Volley
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -21,6 +26,9 @@ class HoyFragment : Fragment() {
     private lateinit var listPrescripcionesHoy: RecyclerView
     private lateinit var adapter: PrescripcionesAdapter
     private lateinit var agregarBtn: Button
+    private val doctorId = 1 // Cambia esto según sea necesario
+    private val fechaHoy: String = "2024-09-29"
+        //SimpleDateFormat("yyyy-MM-dd", Locale("es", "ES")).format(Calendar.getInstance().time)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,13 +57,8 @@ class HoyFragment : Fragment() {
         listPrescripcionesHoy = view.findViewById(R.id.ListPrescripcionesHoy)
         listPrescripcionesHoy.layoutManager = LinearLayoutManager(context)
 
-        // Inicializa el adapter con tu lista de datos
-        val prescripcionesList: List<Prescripcion> = listOf(
-            Prescripcion(1, "Leily Bustamante", "12345678", "20/09/2024"),
-            Prescripcion(2, "Bianca Romero", "87654321", "20/09/2024")
-        )
-
-        adapter = PrescripcionesAdapter(prescripcionesList)
+        // Inicializa el adapter con una lista vacía
+        adapter = PrescripcionesAdapter(emptyList())
         listPrescripcionesHoy.adapter = adapter
 
         // Inicializa el SearchView
@@ -82,7 +85,42 @@ class HoyFragment : Fragment() {
             startActivity(intent)
         }
 
+        // Llamar a la función para obtener las prescripciones
+        obtenerPrescripciones(doctorId, fechaHoy)
         return view
+    }
+
+    private fun obtenerPrescripciones(doctorId: Int, fechaHoy: String) {
+        val url = "https://pillpop-backend.onrender.com/obtenerPrescripcionesXDoctorFecha/$doctorId/$fechaHoy"
+
+        val queue = Volley.newRequestQueue(requireContext())
+
+        val jsonArrayRequest = JsonArrayRequest(
+            Request.Method.GET, url, null,
+            { response ->
+                val prescripcionesList = mutableListOf<Prescripcion>()
+                for (i in 0 until response.length()) {
+                    val jsonObject = response.getJSONObject(i)
+                    val prescripcion = Prescripcion(
+                        jsonObject.getInt("prescripcionId"),
+                        jsonObject.getString("nombreCompleto"),
+                        jsonObject.getInt("dni"),
+                        jsonObject.getString("fecha")
+                    )
+                    prescripcionesList.add(prescripcion)
+                }
+                // Actualiza el adapter con la lista obtenida
+                adapter = PrescripcionesAdapter(prescripcionesList)
+                listPrescripcionesHoy.adapter = adapter
+            },
+            { error: VolleyError ->
+                // Manejo de errores
+                error.printStackTrace()
+            }
+        )
+
+        // Añadir la solicitud a la cola
+        queue.add(jsonArrayRequest)
     }
 
     companion object {

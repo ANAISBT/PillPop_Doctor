@@ -36,7 +36,7 @@ class PrescripcionesAdapter (private val prescripcionesList: List<Prescripcion>)
                     prescripcionesList
                 } else {
                     prescripcionesList.filter {
-                        it.DNI_numero.contains(query)
+                        it.dni.toString().contains(query)
                     }
                 }
                 val results = FilterResults()
@@ -60,9 +60,9 @@ class PrescripcionesAdapter (private val prescripcionesList: List<Prescripcion>)
 
         fun bind(prescripcion: Prescripcion) {
             pillImage.setImageResource(R.drawable.pill)
-            nombrePaciente.text = prescripcion.paciente_nombre
-            dniText.text = prescripcion.DNI_numero
-            fecha.text = prescripcion.fechaIngreso
+            nombrePaciente.text = prescripcion.nombreCompleto
+            dniText.text = prescripcion.dni.toString()
+            fecha.text = prescripcion.fecha
         }
     }
 
