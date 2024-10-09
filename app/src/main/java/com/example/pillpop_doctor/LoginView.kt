@@ -61,8 +61,8 @@ class LoginView : AppCompatActivity() {
 
         // Crear los datos JSON para enviar en el body
         val jsonBody = JSONObject()
-        jsonBody.put("p_dni", dni)
-        jsonBody.put("p_contrasena", contrasena)
+        jsonBody.put("dni", dni)
+        jsonBody.put("contrasena", contrasena)
 
         // Crear la solicitud POST
         val request = JsonObjectRequest(
