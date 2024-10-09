@@ -29,7 +29,7 @@ class HoyFragment : Fragment() {
     private lateinit var adapter: PrescripcionesAdapter
     private lateinit var agregarBtn: Button
     //private val doctorId = 1 // Cambia esto según sea necesario
-    private val fechaHoy: String = SimpleDateFormat("yyyy-MM-dd", Locale("es", "ES")).format(Calendar.getInstance().time)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,15 +87,15 @@ class HoyFragment : Fragment() {
         }
 
         // Llamar a la función para obtener las prescripciones
-        obtenerPrescripciones(doctorId ?: -1, fechaHoy)
+        obtenerPrescripciones(doctorId ?: -1)
         return view
     }
 
-    private fun obtenerPrescripciones(doctorId: Int, fechaHoy: String) {
+    fun obtenerPrescripciones(doctorId: Int) {
         val url = "https://pillpop-backend.onrender.com/obtenerPrescripcionesXDoctorFecha"
 
         val queue = Volley.newRequestQueue(requireContext())
-
+        val fechaHoy: String = SimpleDateFormat("yyyy-MM-dd", Locale("es", "ES")).format(Calendar.getInstance().time)
         // Crear el objeto JSON con los parámetros
         val requestBody = mapOf("doctorId" to doctorId, "fechaHoy" to fechaHoy)
 
