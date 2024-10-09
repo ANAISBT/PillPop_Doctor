@@ -69,6 +69,9 @@ class PrescripcionesAdapter(private val prescripcionesList: List<Prescripcion>) 
             { response ->
                 // Manejar la respuesta exitosa
                 println("Prescripción eliminada exitosamente: $response")
+                // Actualiza la lista de prescripciones
+                filteredPrescripcionesList = filteredPrescripcionesList.filter { it.prescripcionId != prescripcionId }
+                notifyDataSetChanged()
             },
             { error ->
                 // Manejar el error
