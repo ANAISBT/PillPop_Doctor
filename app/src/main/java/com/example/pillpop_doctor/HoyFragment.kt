@@ -20,6 +20,7 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import com.example.pillpop_doctor.doctorId
 
 class HoyFragment : Fragment() {
 
@@ -27,9 +28,8 @@ class HoyFragment : Fragment() {
     private lateinit var listPrescripcionesHoy: RecyclerView
     private lateinit var adapter: PrescripcionesAdapter
     private lateinit var agregarBtn: Button
-    private val doctorId = 1 // Cambia esto según sea necesario
-    private val fechaHoy: String = "2024-09-29"
-        //SimpleDateFormat("yyyy-MM-dd", Locale("es", "ES")).format(Calendar.getInstance().time)
+    //private val doctorId = 1 // Cambia esto según sea necesario
+    private val fechaHoy: String = SimpleDateFormat("yyyy-MM-dd", Locale("es", "ES")).format(Calendar.getInstance().time)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,7 +87,7 @@ class HoyFragment : Fragment() {
         }
 
         // Llamar a la función para obtener las prescripciones
-        obtenerPrescripciones(doctorId, fechaHoy)
+        obtenerPrescripciones(doctorId ?: -1, fechaHoy)
         return view
     }
 
@@ -133,14 +133,5 @@ class HoyFragment : Fragment() {
 
         // Añadir la solicitud a la cola
         queue.add(jsonArrayRequest)
-    }
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HoyFragment().apply {
-                arguments = Bundle().apply {
-                    // Puedes pasar parámetros a través del bundle aquí
-                }
-            }
     }
 }

@@ -71,7 +71,7 @@ class LoginView : AppCompatActivity() {
                 try {
                     val mensaje = response.getString("mensaje")
                     if (mensaje == "Login exitoso") {
-                        val doctorId = response.getInt("id")
+                        doctorId = response.getInt("id")
                         Toast.makeText(this, "Login exitoso, ID: $doctorId", Toast.LENGTH_SHORT).show()
 
                         // Navegar a la vista de bienvenida o la siguiente pantalla
