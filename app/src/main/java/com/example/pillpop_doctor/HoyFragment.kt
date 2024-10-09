@@ -16,6 +16,7 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -91,12 +92,15 @@ class HoyFragment : Fragment() {
     }
 
     private fun obtenerPrescripciones(doctorId: Int, fechaHoy: String) {
-        val url = "https://pillpop-backend.onrender.com/obtenerPrescripcionesXDoctorFecha/$doctorId/$fechaHoy"
+        val url = "https://pillpop-backend.onrender.com/obtenerPrescripcionesXDoctorFecha"
 
         val queue = Volley.newRequestQueue(requireContext())
 
-        val jsonArrayRequest = JsonArrayRequest(
-            Request.Method.GET, url, null,
+        // Crear el objeto JSON con los parámetros
+        val requestBody = mapOf("doctorId" to doctorId, "fechaHoy" to fechaHoy)
+
+        val jsonArrayRequest = object : JsonArrayRequest(
+            Request.Method.POST, url, null,
             { response ->
                 val prescripcionesList = mutableListOf<Prescripcion>()
                 for (i in 0 until response.length()) {
@@ -117,12 +121,19 @@ class HoyFragment : Fragment() {
                 // Manejo de errores
                 error.printStackTrace()
             }
-        )
+        ) {
+            override fun getBody(): ByteArray {
+                return JSONObject(requestBody).toString().toByteArray()
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                return mutableMapOf("Content-Type" to "application/json")
+            }
+        }
 
         // Añadir la solicitud a la cola
         queue.add(jsonArrayRequest)
     }
-
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
