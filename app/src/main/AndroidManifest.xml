@@ -33,7 +33,7 @@
             android:name=".RegisterView"
             android:exported="false" />
         <activity
-            android:name=".DetallePrescripcionView"
+            android:name=".InicioView"
             android:exported="false" />
         <activity
             android:name=".HomeView"
@@ -43,7 +43,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".InicioView"
+            android:name=".DetallePrescripcionView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

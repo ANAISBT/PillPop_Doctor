@@ -43,16 +43,35 @@ class LoginView : AppCompatActivity() {
             val dni = edtDni.text.toString()
             val contrasena = edtContrasena.text.toString()
 
-            if (dni.isNotEmpty() && contrasena.isNotEmpty()) {
-                iniciarSesion(dni, contrasena)
+            // Validaciones
+            val validationMessage = validateInputs(dni, contrasena)
+            if (validationMessage != null) {
+                Toast.makeText(this, validationMessage, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Por favor, ingresa DNI y contraseña", Toast.LENGTH_SHORT).show()
+                iniciarSesion(dni, contrasena)
             }
         }
         btnRegistrarUsuario.setOnClickListener{
             val intent = Intent(this, RegisterView::class.java)
             startActivity(intent)
         }
+    }
+
+    // Método para validar entradas
+    private fun validateInputs(dni: String, contrasena: String): String? {
+        if (dni.isEmpty()) {
+            return "Por favor, ingresa tu DNI."
+        }
+        if (contrasena.isEmpty()) {
+            return "Por favor, ingresa tu contraseña."
+        }
+        if (dni.length != 8) { // Suponiendo que el DNI debe tener 8 dígitos
+            return "El DNI debe tener 8 caracteres."
+        }
+        if (contrasena.length < 6) { // Suponiendo que la contraseña debe tener al menos 6 caracteres
+            return "La contraseña debe tener al menos 6 caracteres."
+        }
+        return null // Si todas las validaciones son exitosas
     }
 
     private fun iniciarSesion(dni: String, contrasena: String) {
@@ -89,7 +108,12 @@ class LoginView : AppCompatActivity() {
                     val statusCode = error.networkResponse.statusCode
                     val errorMsg = String(error.networkResponse.data)
                     Log.e("VolleyError", "Error code: $statusCode, Error message: $errorMsg")
-                    Toast.makeText(this, "Error en el servidor: $statusCode", Toast.LENGTH_LONG).show()
+                    // Manejar diferentes códigos de estado
+                    when (statusCode) {
+                        401 -> Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_LONG).show()
+                        403 -> Toast.makeText(this, "Acceso prohibido", Toast.LENGTH_LONG).show()
+                        else -> Toast.makeText(this, "No se pudo iniciar sesión, intente de nuevo", Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     Log.e("VolleyError", "Error: ${error.message}")
                     Toast.makeText(this, "Error de conexión: ${error.message}", Toast.LENGTH_LONG).show()

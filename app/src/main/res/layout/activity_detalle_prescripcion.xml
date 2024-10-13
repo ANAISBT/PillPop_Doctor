@@ -56,24 +56,41 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="DNI"
+                android:text="DNI del Paciente"
                 android:textAppearance="@style/Labels" />
 
-            <EditText
-                android:id="@+id/DNIInput"
-                style="@style/Inputs"
-                android:layout_width="335dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="4dp"
-                android:backgroundTint="#1FB5C0"
-                android:ems="10"
-                android:inputType="text"
-                android:text=""
-                android:textColor="#721FB5C0"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.506"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/DNIlabel" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/DNIInput"
+                    style="@style/Inputs"
+                    android:layout_width="310dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:backgroundTint="#1FB5C0"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text=""
+                    android:textColor="#FFFFFF"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.506"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/DNIlabel" />
+
+                <ImageButton
+                    android:id="@+id/BuscarPaciente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="6dp"
+                    android:padding="4dp"
+                    android:background="@drawable/rounded_button_turquesa"
+                    app:srcCompat="@drawable/ic_search_white" />
+            </LinearLayout>
+
 
             <TextView
                 android:id="@+id/NombreCompletolabel"
@@ -81,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Nombre Completo"
+                android:text="Nombre Completo del Paciente"
                 android:textAppearance="@style/Labels" />
 
             <EditText
@@ -94,11 +111,14 @@
                 android:ems="10"
                 android:inputType="text"
                 android:text=""
-                android:textColor="#721FB5C0"
+                android:textColor="#FFFFFF"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.506"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/NombreCompletolabel" />
+
 
             <TextView
                 android:id="@+id/Diagnosticolabel"
