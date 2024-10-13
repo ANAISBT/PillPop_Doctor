@@ -34,7 +34,7 @@ class PrescripcionesAdapter(private val prescripcionesList: List<Prescripcion>) 
             { prescripcionId ->
                 // Handle edit action with the prescripcionId
                 val intent = Intent(holder.itemView.context, EditarPrescripcionView::class.java)
-                intent.putExtra("PRESCRIPCION_ID", prescripcionId)
+                intent.putExtra("PRESCRIPCION_ID", prescripcionId.toString())
                 holder.itemView.context.startActivity(intent)
             },
             { prescripcionId ->

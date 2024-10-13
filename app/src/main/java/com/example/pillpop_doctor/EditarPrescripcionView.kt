@@ -29,15 +29,16 @@ class EditarPrescripcionView : AppCompatActivity() {
     private lateinit var buscarPacienteButton: ImageButton
     private lateinit var progressDialog: ProgressDialog
     private lateinit var progressDialog2: ProgressDialog
+    private lateinit var progressDialog3: ProgressDialog
     private val pastillasList: MutableList<Pastilla> = mutableListOf()
+    private lateinit var CancelarButton: Button
+    private lateinit var editarPrescripcionButton: Button
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editar_prescripcion)
 
-        val prescripcionId = "25"
-            //intent.getStringExtra("PRESCRIPCION_ID") // Recupera el valor
+        val prescripcionId = intent.getStringExtra("PRESCRIPCION_ID") // Recupera el valor
 
         listPastillas = findViewById(R.id.ListPastillas)
         listPastillas.layoutManager = LinearLayoutManager(this)
@@ -49,6 +50,10 @@ class EditarPrescripcionView : AppCompatActivity() {
         progressDialog2 = ProgressDialog(this)
         progressDialog2.setMessage("Cargando datos...")
         progressDialog2.setCancelable(false) // Evitar que el usuario lo pueda cancelar
+
+        progressDialog3 = ProgressDialog(this)
+        progressDialog3.setMessage("Editando...")
+        progressDialog3.setCancelable(false) // Evitar que el usuario lo pueda cancelar
         // Inicializa las vistas
         dniInput = findViewById(R.id.DNIInput)
         nombreCompletoInput = findViewById(R.id.NombreCompletoInput)
@@ -64,6 +69,12 @@ class EditarPrescripcionView : AppCompatActivity() {
             buscarPacientePorDNI()
         }
 
+        CancelarButton = findViewById(R.id.CancelarBtn)
+        CancelarButton.setOnClickListener {
+            // Cerrar la actividad y regresar a la anterior
+            finish()
+        }
+
         // Find the button by ID
         val anadirPastillaButton: ImageButton = findViewById(R.id.AnadirPastilla)
 
@@ -72,6 +83,13 @@ class EditarPrescripcionView : AppCompatActivity() {
             // Create an Intent to navigate to DetallePastillavIEW
             val intent = Intent(this, DetallePastillaView::class.java)
             startActivityForResult(intent, REQUEST_CODE_ADD_PASTILLA)
+        }
+
+        editarPrescripcionButton = findViewById(R.id.editarPrescripcionButton)
+        editarPrescripcionButton.setOnClickListener {
+            if (prescripcionId != null) {
+                editarPrescripcion(prescripcionId)
+            }
         }
     }
 
@@ -93,6 +111,116 @@ class EditarPrescripcionView : AppCompatActivity() {
         const val REQUEST_CODE_ADD_PASTILLA = 1
     }
 
+    // Método para obtener y enviar los datos
+    private fun editarPrescripcion(id:String) {
+        progressDialog3.show() // Mostrar el loader antes de hacer la petición
+        // Obtén los datos ingresados
+        val dni = dniInput.text.toString()
+        val nombreCompleto = nombreCompletoInput.text.toString()
+        val diagnostico = diagnosticoInput.text.toString()
+
+        // Validación adicional
+        if (dni.isEmpty() && nombreCompleto.isEmpty()) {
+            Toast.makeText(this, "Por favor busque al paciente", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validar que al menos se haya agregado una pastilla
+        if (pastillasList.isEmpty()) {
+            Toast.makeText(this, "Debes agregar al menos una pastilla", Toast.LENGTH_SHORT).show()
+            return // Detener la ejecución si no hay pastillas
+        }
+
+        val prescripcionId = id.toInt() // O el ID de la prescripción que estás editando
+        val jsonObject = JSONObject().apply {
+            put("p_dni", dni)
+            put("p_prescripcion_id", prescripcionId)
+            put("p_diagnostico", diagnostico)
+            put("p_fecha", obtenerFechaActual()) // Asegúrate de que `fecha` tenga el formato adecuado para el backend
+        }
+
+        val url = "https://pillpop-backend.onrender.com/editarPrescripcion" // Cambia la URL si es necesario
+
+        // Crear la solicitud POST
+        val stringRequest = object : StringRequest(
+            Method.POST, url,
+            Response.Listener<String> { response ->
+                // Manejar la respuesta del servidor
+                val jsonResponse = JSONObject(response)
+                val mensaje = jsonResponse.getString("mensaje")
+
+                // Mostrar el mensaje
+                Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+                // Llamar al método para insertar las pastillas
+                insertarPastillas(prescripcionId)
+                progressDialog3.dismiss()
+            },
+            Response.ErrorListener { error ->
+                Log.e("Error", "Error al editar la prescripción: ${error.message}")
+                Toast.makeText(this, "Error al editar la prescripción", Toast.LENGTH_SHORT).show()
+                progressDialog3.dismiss()
+            }) {
+            override fun getBody(): ByteArray {
+                return jsonObject.toString().toByteArray(Charsets.UTF_8)
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Content-Type"] = "application/json"
+                return headers
+            }
+        }
+
+        // Agregar la solicitud a la cola de solicitudes de Volley
+        Volley.newRequestQueue(this).add(stringRequest)
+    }
+
+    private fun insertarPastillas(prescripcionId: Int) {
+        for (pastilla in pastillasList) {
+            val url = "https://pillpop-backend.onrender.com/insertarPastillas"  // Cambia a la URL de tu servidor
+
+            // Crear un objeto JSON para la solicitud
+            val jsonObject = JSONObject().apply {
+                put("nombre", pastilla.pastilla_nombre)
+                put("cantidad", pastilla.cantidad)
+                put("dosis", pastilla.dosis)
+                put("cantidad_sobrante", pastilla.cantidad)
+                put("frecuencia_id", pastilla.FrecuenciaId)
+                // Fusionar fechaInicio y hora_dosis
+                val fechaPartes = pastilla.fechaInicio.split("/") // Split por "/"
+                val fechaFormateada = "${fechaPartes[2]}-${fechaPartes[1]}-${fechaPartes[0]} ${pastilla.hora}:00" // Formato "yyyy-MM-dd HH:mm:ss"
+                put("fecha_inicio", fechaFormateada)
+                put("observaciones", pastilla.observaciones)
+                put("prescripcion_id", prescripcionId)
+            }
+
+            // Crear la solicitud POST
+            val stringRequest = object : StringRequest(Method.POST, url,
+                Response.Listener<String> { response ->
+                    Log.d("Success", "Pastilla insertada correctamente: $response")
+                },
+                Response.ErrorListener { error ->
+                    Log.e("Error", "Error al insertar pastilla: ${error.message}")
+                    Toast.makeText(this, "No se pudo agregar la prescripcion, intente de nuevo", Toast.LENGTH_SHORT).show()
+                }) {
+                override fun getBody(): ByteArray {
+                    return jsonObject.toString().toByteArray(Charsets.UTF_8)
+                }
+
+                override fun getHeaders(): MutableMap<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Content-Type"] = "application/json"
+                    return headers
+                }
+            }
+
+            // Agregar la solicitud a la cola de solicitudes de Volley
+            Volley.newRequestQueue(this).add(stringRequest)
+        }
+
+        val intent = Intent(this, HomeView::class.java)
+        startActivity(intent)
+    }
     private fun obtenerDatosPrescripcion(id:String) {
         progressDialog2.show() // Mostrar el loader antes de hacer la petición
         val id = id.toInt()
@@ -239,5 +367,10 @@ class EditarPrescripcionView : AppCompatActivity() {
 
         // Agregar la solicitud a la cola de solicitudes de Volley
         Volley.newRequestQueue(this).add(stringRequest)
+    }
+
+    private fun obtenerFechaActual(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return sdf.format(Date())
     }
 }
