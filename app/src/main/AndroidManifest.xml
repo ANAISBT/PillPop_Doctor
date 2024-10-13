@@ -39,11 +39,11 @@
             android:name=".HomeView"
             android:exported="false" />
         <activity
-            android:name=".EditarPrescripcionView"
+            android:name=".InicioView"
             android:exported="false" />
 
         <activity
-            android:name=".InicioView"
+            android:name=".EditarPrescripcionView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
