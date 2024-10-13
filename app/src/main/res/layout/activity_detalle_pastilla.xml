@@ -69,7 +69,7 @@
                 android:ems="10"
                 android:inputType="text"
                 android:text=""
-                android:textColor="#721FB5C0"
+                android:textColor="#FFFFFF"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.506"
                 app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +104,7 @@
                         android:ems="10"
                         android:inputType="number"
                         android:text=""
-                        android:textColor="#721FB5C0"
+                        android:textColor="#FFFFFF"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.506"
                         app:layout_constraintStart_toStartOf="parent"
@@ -138,7 +138,7 @@
                         android:ems="10"
                         android:inputType="number"
                         android:text=""
-                        android:textColor="#721FB5C0"
+                        android:textColor="#FFFFFF"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.506"
                         app:layout_constraintStart_toStartOf="parent"
@@ -169,7 +169,8 @@
                 android:backgroundTint="#1FB5C0"
                 android:padding="5dp"
                 android:layout_margin="5dp"
-                android:textColor="#1FB5C0"
+                android:textColor="#FFFFFF"
+                android:popupBackground="@drawable/spinner_dropdown_background"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.526"
                 app:layout_constraintStart_toStartOf="parent"
@@ -196,6 +197,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:backgroundTint="#1FB5C0"
+                    android:textColor="#FFFFFF"
                     android:inputType="date" />
 
                 <com.google.android.material.button.MaterialButton
@@ -226,6 +228,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="#1FB5C0"
                     android:ems="10"
+                    android:textColor="#FFFFFF"
                     android:inputType="number" />
                 <TextView
                     android:id="@+id/dosPuntosSeparador"
@@ -241,6 +244,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="#1FB5C0"
                     android:ems="10"
+                    android:textColor="#FFFFFF"
                     android:inputType="number" />
             </LinearLayout>
 

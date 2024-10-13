@@ -18,7 +18,7 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".DetallePastillaView"
+            android:name=".DetallePrescripcionView"
             android:exported="false" />
         <activity
             android:name=".BienvenidoView"
@@ -33,7 +33,7 @@
             android:name=".RegisterView"
             android:exported="false" />
         <activity
-            android:name=".InicioView"
+            android:name=".DetallePastillaView"
             android:exported="false" />
         <activity
             android:name=".HomeView"
@@ -43,7 +43,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".DetallePrescripcionView"
+            android:name=".InicioView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

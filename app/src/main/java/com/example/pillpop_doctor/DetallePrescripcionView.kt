@@ -210,6 +210,7 @@ class DetallePrescripcionView : AppCompatActivity() {
             },
             Response.ErrorListener { error ->
                 Log.e("Error", "Error al agregar prescripción: ${error.message}")
+                Toast.makeText(this, "No se pudo agregar la prescripcion, intente de nuevo", Toast.LENGTH_SHORT).show()
             }) {
             override fun getBody(): ByteArray {
                 return jsonObject.toString().toByteArray(Charsets.UTF_8)
@@ -238,7 +239,7 @@ class DetallePrescripcionView : AppCompatActivity() {
                 put("frecuencia_id", pastilla.FrecuenciaId)
                 // Fusionar fechaInicio y hora_dosis
                 val fechaPartes = pastilla.fechaInicio.split("/") // Split por "/"
-                val fechaFormateada = "${fechaPartes[2]}-${fechaPartes[1]}-${fechaPartes[0]} ${pastilla.hora}:00:00" // Formato "yyyy-MM-dd HH:mm:ss"
+                val fechaFormateada = "${fechaPartes[2]}-${fechaPartes[1]}-${fechaPartes[0]} ${pastilla.hora}:00" // Formato "yyyy-MM-dd HH:mm:ss"
                 put("fecha_inicio", fechaFormateada)
                 put("observaciones", pastilla.observaciones)
                 put("prescripcion_id", prescripcionId)
@@ -251,6 +252,8 @@ class DetallePrescripcionView : AppCompatActivity() {
                                           },
                 Response.ErrorListener { error ->
                     Log.e("Error", "Error al insertar pastilla: ${error.message}")
+                    Toast.makeText(this, "No se pudo agregar la prescripcion, intente de nuevo", Toast.LENGTH_SHORT).show()
+                    eliminarPrescripcionYPastillas(prescripcionId)
                 }) {
                 override fun getBody(): ByteArray {
                     return jsonObject.toString().toByteArray(Charsets.UTF_8)
@@ -270,6 +273,35 @@ class DetallePrescripcionView : AppCompatActivity() {
         val intent = Intent(this, HomeView::class.java)
         startActivity(intent)
     }
+
+    private fun eliminarPrescripcionYPastillas(prescripcionId: Int) {
+        val url = "https://pillpop-backend.onrender.com/eliminarPrescripcion"  // Cambia a la URL de tu servidor
+
+        // Crear la solicitud para eliminar la prescripción y las pastillas
+        val stringRequest = object : StringRequest(Method.DELETE, url,
+            Response.Listener<String> { response ->
+                Log.d("Success", "Prescripción y pastillas eliminadas correctamente: $response")
+            },
+            Response.ErrorListener { error ->
+                Log.e("Error", "Error al eliminar la prescripción y pastillas: ${error.message}")
+            }) {
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["id"] = prescripcionId.toString() // Enviar el ID de la prescripción a eliminar
+                return params
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Content-Type"] = "application/x-www-form-urlencoded"
+                return headers
+            }
+        }
+
+        // Agregar la solicitud a la cola de solicitudes de Volley
+        Volley.newRequestQueue(this).add(stringRequest)
+    }
+
     private fun obtenerFechaActual(): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return sdf.format(Date())
