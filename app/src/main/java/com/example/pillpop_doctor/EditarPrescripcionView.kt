@@ -1,5 +1,6 @@
 package com.example.pillpop_doctor
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -30,6 +31,7 @@ class EditarPrescripcionView : AppCompatActivity() {
     private lateinit var progressDialog2: ProgressDialog
     private val pastillasList: MutableList<Pastilla> = mutableListOf()
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editar_prescripcion)
@@ -61,6 +63,34 @@ class EditarPrescripcionView : AppCompatActivity() {
         buscarPacienteButton.setOnClickListener {
             buscarPacientePorDNI()
         }
+
+        // Find the button by ID
+        val anadirPastillaButton: ImageButton = findViewById(R.id.AnadirPastilla)
+
+        // Set OnClickListener to navigate to DetallePastillavIEW
+        anadirPastillaButton.setOnClickListener {
+            // Create an Intent to navigate to DetallePastillavIEW
+            val intent = Intent(this, DetallePastillaView::class.java)
+            startActivityForResult(intent, REQUEST_CODE_ADD_PASTILLA)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == DetallePrescripcionView.REQUEST_CODE_ADD_PASTILLA && resultCode == RESULT_OK) {
+            // Obtener datos desde el intent
+            val nuevaPastilla = data?.getParcelableExtra<Pastilla>("nueva_pastilla")
+            nuevaPastilla?.let {
+                // Añadir la nueva pastilla a la lista
+                pastillasList.add(it)
+                adapterpastilla.notifyDataSetChanged()
+            }
+        }
+    }
+
+    companion object {
+        const val REQUEST_CODE_ADD_PASTILLA = 1
     }
 
     private fun obtenerDatosPrescripcion(id:String) {
