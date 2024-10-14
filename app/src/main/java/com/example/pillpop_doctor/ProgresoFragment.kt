@@ -36,15 +36,22 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ProgresoFragment : Fragment() {
-    private lateinit var buscadorDNI: SearchView
     private lateinit var binding: FragmentProgresoBinding
-    private lateinit var listPacientes: RecyclerView
-    private lateinit var adapter: PacientesAdapter
     private lateinit var progressDialog: ProgressDialog
     private lateinit var requestQueue: RequestQueue
     private lateinit var buscarPacienteButton: ImageButton
     private lateinit var dniInput: EditText
     private lateinit var nombreCompletoInput: EditText
+    private lateinit var editTextDateInicio: EditText
+    private lateinit var editTextDateFin: EditText
+    private lateinit var editTextDateUnico: EditText
+    // Declaración de variables que se pueden leer en todo el fragmento
+    private var fechaInicio: String = ""
+    private var fechaFin: String = ""
+    private var fechaUnica: String = ""
+    private var dniPaciente: String = ""
+    private var nombreCompleto: String = ""
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,9 +71,10 @@ class ProgresoFragment : Fragment() {
         val frecuenciaTiempoList = resources.getStringArray(R.array.frecuencia_reporte_array)
         val adapterFrecuenciaTiempo = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item,
+            R.layout.spinner_item,
             frecuenciaTiempoList
         )
+        adapterFrecuenciaTiempo.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinnerFrecuenciaTiempo.adapter = adapterFrecuenciaTiempo
 
         val linearEntreFechas: LinearLayout = view.findViewById(R.id.LinearEntreFechas)
@@ -124,17 +132,63 @@ class ProgresoFragment : Fragment() {
             datePickerDialog.show()
         }
 
+        val calendarioInicio = Calendar.getInstance()
+        val fechaInicio = DatePickerDialog.OnDateSetListener { _, year, month, day ->
+            calendarioInicio.set(Calendar.YEAR, year)
+            calendarioInicio.set(Calendar.MONTH, month)
+            calendarioInicio.set(Calendar.DAY_OF_MONTH, day)
+
+            actualizarFechaInicio(calendarioInicio)
+        }
+
+        binding.fechaPickBtnInicio.setOnClickListener {
+            val datePickerDialog = DatePickerDialog(
+                requireActivity(),
+                fechaInicio,
+                calendarioInicio.get(Calendar.YEAR),
+                calendarioInicio.get(Calendar.MONTH),
+                calendarioInicio.get(Calendar.DAY_OF_MONTH)
+            )
+            datePickerDialog.datePicker.minDate = calendarioInicio.timeInMillis
+            datePickerDialog.show()
+        }
+
+        val calendarioFin = Calendar.getInstance()
+        val fechaFin = DatePickerDialog.OnDateSetListener { _, year, month, day ->
+            calendarioFin.set(Calendar.YEAR, year)
+            calendarioFin.set(Calendar.MONTH, month)
+            calendarioFin.set(Calendar.DAY_OF_MONTH, day)
+
+            actualizarFechaFin(calendarioFin)
+        }
+
+        binding.fechaPickBtnFin.setOnClickListener {
+            val datePickerDialog = DatePickerDialog(
+                requireActivity(),
+                fechaFin,
+                calendarioFin.get(Calendar.YEAR),
+                calendarioFin.get(Calendar.MONTH),
+                calendarioFin.get(Calendar.DAY_OF_MONTH)
+            )
+            datePickerDialog.datePicker.minDate = calendarioInicio.timeInMillis
+            datePickerDialog.show()
+        }
+
+        // Inicializa las vistas
+        editTextDateInicio = view.findViewById(R.id.editTextDateInicio)
+        editTextDateFin = view.findViewById(R.id.editTextDateFin)
+        editTextDateUnico = view.findViewById(R.id.editTextDateUnico)
+        dniInput = view.findViewById(R.id.DNIInput)
+        nombreCompletoInput = view.findViewById(R.id.NombreCompletoInput)
 
         // Vincular el botón de descarga de PDF
         val descargarBtn = view.findViewById<Button>(R.id.Descargar_btn)
 
         descargarBtn.setOnClickListener {
-            abrirSelectorDeArchivos()
+            obtenerDatosReporte()
+            //abrirSelectorDeArchivos()
         }
 
-        // Inicializa las vistas
-        dniInput = view.findViewById(R.id.DNIInput)
-        nombreCompletoInput = view.findViewById(R.id.NombreCompletoInput)
 
         // Inicializa el botón de búsqueda
         buscarPacienteButton = view.findViewById(R.id.BuscarPaciente)
@@ -143,6 +197,39 @@ class ProgresoFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun obtenerDatosReporte() {
+        // Obtén las fechas y el DNI
+        fechaInicio = editTextDateInicio.text.toString()
+        fechaFin = editTextDateFin.text.toString()
+        fechaUnica = editTextDateUnico.text.toString()
+        dniPaciente = dniInput.text.toString()
+        nombreCompleto=nombreCompletoInput.text.toString()
+
+        val spinnerFrecuenciaTiempo: Spinner = binding.FrecuenciaReporteDrop // Asegúrate de tener acceso al spinner
+
+        val frecuenciaSeleccionada = spinnerFrecuenciaTiempo.selectedItem.toString()
+
+        // Validaciones
+        when {
+            frecuenciaSeleccionada == "Seleccionar..." -> {
+                Toast.makeText(requireContext(), "Necesita seleccionar un tiempo", Toast.LENGTH_SHORT).show()
+                return // Salimos de la función si no se seleccionó
+            }
+            frecuenciaSeleccionada == "Diario" && fechaUnica.isEmpty() -> {
+                Toast.makeText(requireContext(), "Para frecuencia diaria, la fecha única no puede estar vacía", Toast.LENGTH_SHORT).show()
+                return
+            }
+            frecuenciaSeleccionada == "Entre Fechas" && (fechaInicio.isEmpty() || fechaFin.isEmpty()) -> {
+                Toast.makeText(requireContext(), "Para frecuencia entre fechas, ambas fechas deben ser seleccionadas", Toast.LENGTH_SHORT).show()
+                return
+            }
+            dniPaciente.isEmpty() || nombreCompleto.isEmpty() -> {
+                Toast.makeText(requireContext(), "Hay que seleccionar un paciente", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
     }
 
     private fun buscarPacientePorDNI() {
@@ -489,6 +576,17 @@ class ProgresoFragment : Fragment() {
         binding.editTextDateUnico.setText(formatoSimple.format(calendar.time))
     }
 
+    private fun actualizarFechaInicio(calendar: Calendar) {
+        val formatoFecha = "dd/MM/yyyy"
+        val formatoSimple = SimpleDateFormat(formatoFecha, Locale("es", "ES"))
+        binding.editTextDateInicio.setText(formatoSimple.format(calendar.time))
+    }
+
+    private fun actualizarFechaFin(calendar: Calendar) {
+        val formatoFecha = "dd/MM/yyyy"
+        val formatoSimple = SimpleDateFormat(formatoFecha, Locale("es", "ES"))
+        binding.editTextDateFin.setText(formatoSimple.format(calendar.time))
+    }
     companion object {
         private const val REQUEST_CODE_CREATE_DOCUMENT = 1
 
