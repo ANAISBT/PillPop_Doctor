@@ -41,7 +41,9 @@
         <activity
             android:name=".EditarPrescripcionView"
             android:exported="false" />
-
+        <activity
+            android:name=".EditarPastillaView"
+            android:exported="false" />
         <activity
             android:name=".InicioView"
             android:exported="true">

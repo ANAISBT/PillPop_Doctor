@@ -1,6 +1,7 @@
 package com.example.pillpop_doctor
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -105,11 +106,25 @@ class EditarPrescripcionView : AppCompatActivity() {
                 adapterpastilla.notifyDataSetChanged()
             }
         }
+        if (requestCode == EDITAR_PASTILLA_REQUEST_CODE && resultCode == RESULT_OK) {
+            val nuevaPastilla = data?.getParcelableExtra<Pastilla>("nueva_pastilla")
+            nuevaPastilla?.let {
+                // Actualizar la lista de pastillas y notificar al adaptador
+                val position = pastillasList.indexOfFirst { p -> p.pastillla_id == it.pastillla_id }
+                if (position != -1) {
+                    pastillasList[position] = it
+                    adapterpastilla.notifyItemChanged(position)
+                }
+            }
+        }
     }
+
 
     companion object {
         const val REQUEST_CODE_ADD_PASTILLA = 1
+        const val EDITAR_PASTILLA_REQUEST_CODE = 2
     }
+
 
     // Método para obtener y enviar los datos
     private fun editarPrescripcion(id:String) {

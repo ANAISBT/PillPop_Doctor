@@ -1,5 +1,6 @@
 package com.example.pillpop_doctor
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,23 @@ class PastillaAdapter(private val pastillasList: MutableList<Pastilla>) : Recycl
         holder.itemView.findViewById<ImageView>(R.id.eliminarPastillaButton).setOnClickListener {
             // Eliminar la pastilla de la lista
             eliminarPastilla(position)
+        }
+        holder.itemView.findViewById<ImageView>(R.id.editarPastillaButton).setOnClickListener {
+            val context = holder.itemView.context
+            val intent = Intent(context, EditarPastillaView::class.java)
+
+            // Pasar los datos de la pastilla al Intent
+            intent.putExtra("pastilla_id", pastilla.pastillla_id)
+            intent.putExtra("pastilla_nombre", pastilla.pastilla_nombre)
+            intent.putExtra("cantidad", pastilla.cantidad)
+            intent.putExtra("dosis", pastilla.dosis)
+            intent.putExtra("frecuencia", pastilla.Frecuencia)
+            intent.putExtra("fechaInicio", pastilla.fechaInicio)
+            intent.putExtra("hora", pastilla.hora)
+            intent.putExtra("observaciones", pastilla.observaciones)
+
+            // Iniciar la actividad para editar la pastilla
+            context.startActivity(intent)
         }
     }
 
