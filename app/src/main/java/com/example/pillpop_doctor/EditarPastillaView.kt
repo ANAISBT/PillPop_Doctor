@@ -37,6 +37,7 @@ class EditarPastillaView : AppCompatActivity() {
     private lateinit var minutosDosisInput: EditText
     private lateinit var observacionesInput: EditText
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var CancelarButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,9 +110,14 @@ class EditarPastillaView : AppCompatActivity() {
         btnEditar.setOnClickListener {
             obtenerDatos(idPastilla)
         }
-        // Cargar las frecuencias y establecer la selección una vez cargadas
+        CancelarButton = findViewById(R.id.CancelarBtn)
+        CancelarButton.setOnClickListener {
+            // Cerrar la actividad y regresar a la anterior
+            finish()
+        }
 
     }
+
 
     private fun obtenerDatos(idPastilla:Int) {
         // Obtén los datos ingresados
@@ -147,6 +153,7 @@ class EditarPastillaView : AppCompatActivity() {
             return
         }
         if (minutosDosis.isEmpty() || minutosDosis.toIntOrNull() == null || minutosDosis.toInt() !in 0..59) {
+
             minutosDosisInput.error = "Los minutos de la dosis deben ser un número entre 00 y 59"
             return
         }
