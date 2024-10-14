@@ -10,12 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
-
 class PerfilFragment : Fragment() {
     private lateinit var tvProfileName: TextView
     private lateinit var tvProfileOccupation: TextView
@@ -52,6 +52,20 @@ class PerfilFragment : Fragment() {
         editarPerfilButton.setOnClickListener {
             val intent = Intent(requireContext(), EditarPerfilView::class.java)
             startActivityForResult(intent, EDITAR_PERFIL_REQUEST_CODE) // Cambia a startActivityForResult
+        }
+
+        // Inicializa las vistas para cambiar contraseña
+        val editContrasenaView: ImageView = view.findViewById(R.id.EditContrasenaView)
+        val editContrasenaViewText: TextView = view.findViewById(R.id.EditContrasenaViewText)
+
+        val cambiarContrasenaIntent = Intent(requireContext(), CambiarComtraseñaView::class.java)
+
+        editContrasenaView.setOnClickListener {
+            startActivity(cambiarContrasenaIntent)
+        }
+
+        editContrasenaViewText.setOnClickListener {
+            startActivity(cambiarContrasenaIntent)
         }
 
         return view

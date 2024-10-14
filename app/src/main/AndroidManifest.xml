@@ -45,6 +45,9 @@
             android:name=".EditarPastillaView"
             android:exported="false" />
         <activity
+            android:name=".CambiarComtraseñaView"
+            android:exported="false" />
+        <activity
             android:name=".InicioView"
             android:exported="true">
             <intent-filter>
