@@ -1,6 +1,7 @@
 package com.example.pillpop_doctor
 
 import android.app.DatePickerDialog
+import android.app.ProgressDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,8 +14,17 @@ import android.widget.SearchView
 import android.widget.Spinner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.example.pillpop_doctor.databinding.ActivityDetallePastillaBinding
 import com.example.pillpop_doctor.databinding.FragmentProgresoBinding
+import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -24,6 +34,8 @@ class ProgresoFragment : Fragment() {
     private lateinit var binding: FragmentProgresoBinding
     private lateinit var listPacientes: RecyclerView
     private lateinit var adapter: PacientesAdapter
+    private lateinit var requestQueue: RequestQueue
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,6 +43,13 @@ class ProgresoFragment : Fragment() {
     ): View? {
         binding = FragmentProgresoBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        requestQueue = Volley.newRequestQueue(requireContext())
+
+        // Inicializar el ProgressDialog
+        progressDialog = ProgressDialog(requireContext())
+        progressDialog.setMessage("Cargando pacientes...")
+        progressDialog.setCancelable(false)
 
         val spinnerFrecuenciaTiempo: Spinner = view.findViewById(R.id.FrecuenciaReporteDrop)
         val frecuenciaTiempoList = resources.getStringArray(R.array.frecuencia_reporte_array)
@@ -133,22 +152,8 @@ class ProgresoFragment : Fragment() {
         listPacientes = view.findViewById(R.id.ListPacientes)
         listPacientes.layoutManager = LinearLayoutManager(context)
 
-        // Initialize the adapter with your data
-        val listaPacientes: List<Paciente> = listOf(
-            Paciente(1, "Leily Bustamante", "12345678"),
-            Paciente(1, "Bianca Romero", "87654321"),
-            Paciente(1, "Leily Bustamante", "12345678"),
-            Paciente(1, "Bianca Romero", "87654321"),
-            Paciente(1, "Leily Bustamante", "12345678"),
-            Paciente(1, "Bianca Romero", "87654321"),
-            Paciente(1, "Leily Bustamante", "12345678"),
-            Paciente(1, "Bianca Romero", "87654321"),
-            Paciente(1, "Leily Bustamante", "12345678"),
-            Paciente(1, "Bianca Romero", "87654321"),
-        ) // Inicializa tu lista aquí
-
-        adapter = PacientesAdapter(listaPacientes)
-        listPacientes.adapter = adapter
+        // Cargar la lista de pacientes
+        cargarPacientes()
 
         // Initialize the SearchView
         buscadorDNI = view.findViewById(R.id.searchViewDNIReporte)
@@ -166,6 +171,49 @@ class ProgresoFragment : Fragment() {
 
         return view
     }
+
+    private fun cargarPacientes() {
+        progressDialog.show()
+        val url = "https://pillpop-backend.onrender.com/ObtenerPacientesPorDoctor" // Cambia esto por tu URL
+
+        // Crear el objeto JSON que se enviará como cuerpo de la solicitud
+        val params = JSONObject()
+        params.put("doctor_id", doctorId)
+
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            params,
+            { response ->
+                val listaPacientes = mutableListOf<Paciente>()
+
+                // Aquí asumimos que la respuesta es un objeto JSON que contiene un array de pacientes
+                val pacientesArray: JSONArray = response.getJSONArray("pacientes")
+
+                for (i in 0 until pacientesArray.length()) {
+                    val jsonObject: JSONObject = pacientesArray.getJSONObject(i)
+                    val id = jsonObject.getInt("id")
+                    val nombre = jsonObject.getString("nombrePaciente") // Cambiado a "nombrePaciente"
+                    val dni = jsonObject.getString("dniPaciente") // Cambiado a "dniPaciente"
+                    listaPacientes.add(Paciente(id, nombre, dni))
+                }
+
+                // Inicializa el adaptador con los datos obtenidos
+                adapter = PacientesAdapter(listaPacientes)
+                listPacientes.adapter = adapter
+                progressDialog.dismiss()
+            },
+            { error: VolleyError ->
+                // Maneja el error aquí
+                error.printStackTrace()
+                progressDialog.dismiss()
+            }
+        )
+
+        // Agregar la solicitud a la cola
+        requestQueue.add(jsonObjectRequest)
+    }
+
 
     // Funciones para actualizar campos de fecha
     private fun actualizarFecha(calendar: Calendar) {
