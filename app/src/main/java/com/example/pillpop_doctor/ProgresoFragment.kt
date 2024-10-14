@@ -274,7 +274,73 @@ class ProgresoFragment : Fragment() {
         // Registro Diario (ejemplo simple)
         canvas.drawText("Registro Diario:", 10f, y, subtitulo)
         y += 20f
-        canvas.drawText("Cumplimiento total del tratamiento: 80%", 10f, y, tableTextPaint)
+        // Crear tabla de registro diario
+        val registroTitulos = arrayOf("Fecha", "Pastilla 1", "Pastilla 2", "Pastilla 3")
+        val registros = arrayOf(
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔"),
+            arrayOf("01/07/2024", "✔", "✖", "✔"),
+            arrayOf("02/07/2024", "✔", "✔", "✖"),
+            arrayOf("03/07/2024", "✖", "✖", "✔")
+        )
+
+        // Dibujar títulos de la tabla
+        tablePaint.color = Color.LTGRAY
+        canvas.drawRect(10f, y, 806f, y + 20f, tablePaint)
+
+        for (i in registroTitulos.indices) {
+            canvas.drawText(registroTitulos[i], 20f + i * 120f, y + 15f, tableTextPaint)
+        }
+
+        // Espacio para los registros
+        y += 30f
+
+        for (registro in registros) {
+            for (i in registro.indices) {
+                canvas.drawText(registro[i], 20f + i * 120f, y + 15f, tableTextPaint)
+            }
+            y += 30f
+        }
 
         pdfDocument.finishPage(pagina1)
 
