@@ -202,6 +202,7 @@
                 android:padding="16dp">
 
                 <ImageView
+                    android:id="@+id/CerrarSesionImg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/rounded_corners_icon_turquesa"
@@ -210,10 +211,11 @@
                     app:tint="@color/white" />
 
                 <TextView
+                    android:id="@+id/CerrarSesionText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="23dp"
-                    android:text="Cerrar Sesiòn"
+                    android:text="Cerrar Sesión"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
             </LinearLayout>

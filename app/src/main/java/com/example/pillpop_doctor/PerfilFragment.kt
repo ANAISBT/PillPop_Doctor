@@ -68,6 +68,26 @@ class PerfilFragment : Fragment() {
             startActivity(cambiarContrasenaIntent)
         }
 
+        // Inicializa las vistas para cerrar sesión
+        val cerrarSesionImg: ImageView = view.findViewById(R.id.CerrarSesionImg)
+        val cerrarSesionText: TextView = view.findViewById(R.id.CerrarSesionText)
+
+        val cerrarSesionIntent = Intent(requireContext(), InicioView::class.java) // Cambia esto al nombre de tu actividad de inicio de sesión
+
+        val cerrarSesionListener = View.OnClickListener {
+            // Establece doctorId a 0
+            doctorId = 0 // Asegúrate de que doctorId sea una variable accesible desde aquí
+
+            // Aquí cierras la sesión
+            val cerrarSesionIntent = Intent(requireContext(), InicioView::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(cerrarSesionIntent)
+        }
+
+        cerrarSesionImg.setOnClickListener(cerrarSesionListener)
+        cerrarSesionText.setOnClickListener(cerrarSesionListener)
+
         return view
     }
 
