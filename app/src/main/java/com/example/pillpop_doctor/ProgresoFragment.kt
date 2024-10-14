@@ -184,7 +184,7 @@ class ProgresoFragment : Fragment() {
 
         // Descripción
         descripcion.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL))
-        descripcion.textSize = 14f
+        descripcion.textSize = 16f
         descripcion.color = Color.BLACK // Color del texto normal
 
         val arrDescripcion = descripcionText.split("\n")
@@ -243,13 +243,13 @@ class ProgresoFragment : Fragment() {
         canvas.drawRect(10f, y, 806f, y + 20f, tablePaint)
 
         // Títulos de la tabla
-        tableTextPaint.textSize = 12f
+        tableTextPaint.textSize = 16f
 
         canvas.drawText("Tratamiento", 20f, y + 15f, tableTextPaint)
         canvas.drawText("Dosis", 200f, y + 15f, tableTextPaint)
         canvas.drawText("Duración", 320f, y + 15f, tableTextPaint)
         canvas.drawText("Frecuencia", 440f, y + 15f, tableTextPaint)
-        canvas.drawText("Horario", 580f, y + 15f, tableTextPaint)
+        canvas.drawText("Horario", 620f, y + 15f, tableTextPaint)
 
         // Datos de la tabla (ejemplo, agrega tus datos reales aquí)
         val tratamientos = arrayOf(
@@ -264,8 +264,8 @@ class ProgresoFragment : Fragment() {
             drawMultilineText(canvas, tratamiento[1], 200f, y, tableTextPaint, 80f)
             drawMultilineText(canvas, tratamiento[2], 320f, y, tableTextPaint, 80f)
             drawMultilineText(canvas, tratamiento[3], 440f, y, tableTextPaint, 140f)
-            drawMultilineText(canvas, tratamiento[4], 580f, y, tableTextPaint, 100f)
-            y += 30f
+            drawMultilineText(canvas, tratamiento[4], 620f, y, tableTextPaint, 100f)
+            y += 50f
         }
 
         // Espacio antes del Registro Diario
