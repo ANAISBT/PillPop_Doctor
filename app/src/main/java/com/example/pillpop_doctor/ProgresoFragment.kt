@@ -51,6 +51,7 @@ class ProgresoFragment : Fragment() {
     private var fechaUnica: String = ""
     private var dniPaciente: String = ""
     private var nombreCompleto: String = ""
+    private var frecuenciaSeleccionada: String = ""
 
 
     override fun onCreateView(
@@ -186,7 +187,7 @@ class ProgresoFragment : Fragment() {
 
         descargarBtn.setOnClickListener {
             obtenerDatosReporte()
-            //abrirSelectorDeArchivos()
+            abrirSelectorDeArchivos()
         }
 
 
@@ -209,7 +210,7 @@ class ProgresoFragment : Fragment() {
 
         val spinnerFrecuenciaTiempo: Spinner = binding.FrecuenciaReporteDrop // Asegúrate de tener acceso al spinner
 
-        val frecuenciaSeleccionada = spinnerFrecuenciaTiempo.selectedItem.toString()
+        frecuenciaSeleccionada = spinnerFrecuenciaTiempo.selectedItem.toString()
 
         // Validaciones
         when {
