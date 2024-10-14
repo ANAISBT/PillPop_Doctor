@@ -50,8 +50,13 @@ class CambiarComtraseñaView  : AppCompatActivity() {
         EditarContrasenaButton= findViewById(R.id.EditarContrasenaButton)
         EditarContrasenaButton.setOnClickListener {
             val nuevaContrasena = contrasenaEditInput.text.toString()
-            // Cerrar la actividad y regresar a la anterior
-            doctorId?.let { it1 -> editarContrasenaDoctor(it1,nuevaContrasena) }
+            if (nuevaContrasena.length <= 6) {
+                // Mostrar un mensaje de error, por ejemplo, usando un Toast
+                Toast.makeText(this, "La nueva contraseña debe tener más de 6 caracteres", Toast.LENGTH_SHORT).show()
+            } else {
+                // Cerrar la actividad y regresar a la anterior
+                doctorId?.let { it1 -> editarContrasenaDoctor(it1, nuevaContrasena) }
+            }
         }
     }
     private fun editarContrasenaDoctor(id: Int, nuevaContrasena: String) {
