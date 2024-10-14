@@ -1,12 +1,15 @@
 package com.example.pillpop_doctor
 
+import android.app.Activity
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -17,6 +20,7 @@ class PerfilFragment : Fragment() {
     private lateinit var tvProfileName: TextView
     private lateinit var tvProfileOccupation: TextView
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var editarPerfilButton: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +43,16 @@ class PerfilFragment : Fragment() {
         // Inicializa las vistas
         tvProfileName = view.findViewById(R.id.tvProfileName)
         tvProfileOccupation = view.findViewById(R.id.tvProfileOccupation)
+        editarPerfilButton = view.findViewById(R.id.editarButton)
 
         // Llama a la función para obtener los datos del doctor
         obtenerDatosDoctor()
+
+        // Establecer el OnClickListener para el botón de editar perfil
+        editarPerfilButton.setOnClickListener {
+            val intent = Intent(requireContext(), EditarPerfilView::class.java)
+            startActivityForResult(intent, EDITAR_PERFIL_REQUEST_CODE) // Cambia a startActivityForResult
+        }
 
         return view
     }
@@ -87,13 +98,15 @@ class PerfilFragment : Fragment() {
         Volley.newRequestQueue(requireContext()).add(jsonRequest)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == EDITAR_PERFIL_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // Llama a la función para obtener los datos del doctor nuevamente
+            obtenerDatosDoctor()
+        }
+    }
 
     companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            PerfilFragment().apply {
-                arguments = Bundle().apply {
-                }
-            }
+        private const val EDITAR_PERFIL_REQUEST_CODE = 1 // Define el código de solicitud
     }
 }

@@ -36,6 +36,7 @@ class DetallePastillaView : AppCompatActivity() {
     private lateinit var minutosDosisInput: EditText
     private lateinit var observacionesInput: EditText
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var CancelarButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +68,11 @@ class DetallePastillaView : AppCompatActivity() {
         progressDialog.setMessage("Cargando datos...")
         progressDialog.setCancelable(false) // Evitar que el usuario lo pueda cancelar
 
+        CancelarButton = findViewById(R.id.CancelarBtn)
+        CancelarButton.setOnClickListener {
+            // Cerrar la actividad y regresar a la anterior
+            finish()
+        }
         // Configurar el adaptador para el Spinner
         spinnerFrecuencia= findViewById(R.id.frecuenciasDrop)
 
