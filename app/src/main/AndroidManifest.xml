@@ -37,7 +37,7 @@
             android:name=".DetallePastillaView"
             android:exported="false" />
         <activity
-            android:name=".HomeView"
+            android:name=".InicioView"
             android:exported="false" />
         <activity
             android:name=".EditarPrescripcionView"
@@ -49,7 +49,7 @@
             android:name=".CambiarComtraseñaView"
             android:exported="false" />
         <activity
-            android:name=".InicioView"
+            android:name=".HomeView"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

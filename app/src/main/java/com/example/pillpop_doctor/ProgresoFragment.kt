@@ -130,21 +130,18 @@ class ProgresoFragment : Fragment() {
         // Vincular el botón de descarga de PDF
         val descargarBtn = view.findViewById<Button>(R.id.Descargar_btn)
 
-        val tituloText = "Este es el título del documento"
-        val descripcionText = "Lorem Ipsum es simplemente texto de muestra de la industria de la impresión y la composición tipográfica..."
-
         descargarBtn.setOnClickListener {
-            abrirSelectorDeArchivos(tituloText, descripcionText)
+            abrirSelectorDeArchivos()
         }
 
         return view
     }
 
-    private fun abrirSelectorDeArchivos(tituloText: String, descripcionText: String) {
+    private fun abrirSelectorDeArchivos() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "application/pdf"
-            putExtra(Intent.EXTRA_TITLE, "Archivo.pdf")
+            putExtra(Intent.EXTRA_TITLE, "Reporte de Progreso.pdf")
         }
         startActivityForResult(intent, REQUEST_CODE_CREATE_DOCUMENT)
     }
@@ -153,7 +150,7 @@ class ProgresoFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_CREATE_DOCUMENT && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                generarPdf(uri, "Este es el título del documento", "Lorem Ipsum es simplemente texto de muestra de la industria de la impresión y la composición tipográfica...")
+                generarPdf(uri, "Reporte de Progreso", "Este documento contiene el seguimiento del tratamiento médico.")
             }
         }
     }
@@ -162,31 +159,122 @@ class ProgresoFragment : Fragment() {
         val pdfDocument = PdfDocument()
         val paint = Paint()
         val titulo = TextPaint()
+        val subtitulo = TextPaint()
         val descripcion = TextPaint()
+        val tablePaint = Paint()
+        val tableTextPaint = TextPaint()
 
         val paginaInfo = PdfDocument.PageInfo.Builder(816, 1054, 1).create()
         val pagina1 = pdfDocument.startPage(paginaInfo)
 
         val canvas = pagina1.canvas
 
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo2)
-        val bitmapEscala = Bitmap.createScaledBitmap(bitmap, 80, 80, false)
-        canvas.drawBitmap(bitmapEscala, 368f, 20f, paint)
+        // Fondo blanco
+        canvas.drawColor(Color.WHITE)
 
+        // Título
         titulo.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD))
-        titulo.textSize = 20f
-        canvas.drawText(tituloText, 10f, 150f, titulo)
+        titulo.textSize = 24f
+        paint.color = Color.BLACK // Cambia el color del texto
+        canvas.drawText(tituloText, 10f, 50f, titulo)
 
+        // Línea debajo del título
+        paint.strokeWidth = 3f
+        canvas.drawLine(10f, 70f, 806f, 70f, paint)
+
+        // Descripción
         descripcion.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL))
         descripcion.textSize = 14f
+        descripcion.color = Color.BLACK // Color del texto normal
 
         val arrDescripcion = descripcionText.split("\n")
 
-        var y = 200f
+        var y = 100f
         for (item in arrDescripcion) {
             canvas.drawText(item, 10f, y, descripcion)
-            y += 15
+            y += 20
         }
+
+        // Espacio entre la descripción y la tabla
+        y += 20f
+
+        // Información del mes, doctor y fecha
+        val mes = "Mes: Junio"
+        val doctor = "Doctor: José Perez Cabrera"
+        val fecha = "Fecha: 03 de julio del 2024"
+
+        // Estilo para la información en negrita
+        val infoBoldPaint = TextPaint().apply {
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            textSize = 16f
+            color = Color.BLACK
+        }
+
+        val infoNormalPaint = TextPaint().apply {
+            typeface = Typeface.defaultFromStyle(Typeface.NORMAL)
+            textSize = 16f
+            color = Color.BLACK
+        }
+
+        // Título
+        subtitulo.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD))
+        subtitulo.textSize = 20f
+
+        canvas.drawText("Datos de Reporte:", 10f, y, subtitulo)
+        y += 40f
+
+        canvas.drawText("Mes:", 10f, y, infoBoldPaint)
+        canvas.drawText("Junio", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        y += 20f
+        canvas.drawText("Doctor:", 10f, y, infoBoldPaint)
+        canvas.drawText("José Perez Cabrera", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        y += 20f
+        canvas.drawText("Fecha:", 10f, y, infoBoldPaint)
+        canvas.drawText("03 de julio del 2024", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+
+        // Espacio entre la información y la tabla
+        y += 40f
+
+        canvas.drawText("Tratamiento:", 10f, y, subtitulo)
+        y += 20f
+
+        // Tabla de Tratamiento
+        tablePaint.color = Color.LTGRAY
+        canvas.drawRect(10f, y, 806f, y + 20f, tablePaint)
+
+        // Títulos de la tabla
+        tableTextPaint.textSize = 12f
+
+        canvas.drawText("Tratamiento", 20f, y + 15f, tableTextPaint)
+        canvas.drawText("Dosis", 200f, y + 15f, tableTextPaint)
+        canvas.drawText("Duración", 320f, y + 15f, tableTextPaint)
+        canvas.drawText("Frecuencia", 440f, y + 15f, tableTextPaint)
+        canvas.drawText("Horario", 580f, y + 15f, tableTextPaint)
+
+        // Datos de la tabla (ejemplo, agrega tus datos reales aquí)
+        val tratamientos = arrayOf(
+            arrayOf("Pastilla 1", "100gr", "2 semanas", "Diaria", "8:00 AM"),
+            arrayOf("Pastilla 2", "100gr", "1 mes", "Dos días seguidos, dejando un día", "10:00 AM"),
+            arrayOf("Pastilla 3", "100gr", "1 mes", "Interdiario", "6:00 PM")
+        )
+
+        y += 40f
+        for (tratamiento in tratamientos) {
+            drawMultilineText(canvas, tratamiento[0], 20f, y, tableTextPaint, 180f)
+            drawMultilineText(canvas, tratamiento[1], 200f, y, tableTextPaint, 80f)
+            drawMultilineText(canvas, tratamiento[2], 320f, y, tableTextPaint, 80f)
+            drawMultilineText(canvas, tratamiento[3], 440f, y, tableTextPaint, 140f)
+            drawMultilineText(canvas, tratamiento[4], 580f, y, tableTextPaint, 100f)
+            y += 30f
+        }
+
+        // Espacio antes del Registro Diario
+        y += 40f
+
+        // Registro Diario (ejemplo simple)
+        canvas.drawText("Registro Diario:", 10f, y, subtitulo)
+        y += 20f
+        canvas.drawText("Cumplimiento total del tratamiento: 80%", 10f, y, tableTextPaint)
 
         pdfDocument.finishPage(pagina1)
 
@@ -203,6 +291,27 @@ class ProgresoFragment : Fragment() {
         }
 
         pdfDocument.close()
+    }
+
+    fun drawMultilineText(canvas: Canvas, text: String, x: Float, y: Float, paint: TextPaint, maxWidth: Float) {
+        val words = text.split(" ")
+        var line = ""
+        var lineHeight = paint.descent() - paint.ascent()
+        var cellY = y
+
+        for (word in words) {
+            val testLine = "$line $word".trim()
+            val testWidth = paint.measureText(testLine)
+
+            if (testWidth > maxWidth) {
+                canvas.drawText(line, x, cellY, paint)
+                line = word // Iniciar nueva línea con la palabra actual
+                cellY += lineHeight // Aumentar la altura para la próxima línea
+            } else {
+                line = testLine
+            }
+        }
+        canvas.drawText(line, x, cellY, paint) // Dibuja la última línea
     }
 
     private fun cargarPacientes() {
