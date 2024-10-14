@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 
-class PastillaAdapter(private val pastillasList: List<Pastilla>) : RecyclerView.Adapter<PastillaAdapter.ViewHolder>() {
+class PastillaAdapter(private val pastillasList: MutableList<Pastilla>) : RecyclerView.Adapter<PastillaAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_pastillas, parent, false)
@@ -20,6 +20,15 @@ class PastillaAdapter(private val pastillasList: List<Pastilla>) : RecyclerView.
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val pastilla = pastillasList[position]
         holder.bind(pastilla)
+        holder.itemView.findViewById<ImageView>(R.id.eliminarPastillaButton).setOnClickListener {
+            // Eliminar la pastilla de la lista
+            eliminarPastilla(position)
+        }
+    }
+
+    private fun eliminarPastilla(position: Int) {
+        pastillasList.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     override fun getItemCount(): Int = pastillasList.size
