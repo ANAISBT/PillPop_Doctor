@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.TextPaint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +23,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
+import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.pillpop_doctor.databinding.FragmentProgresoBinding
 import org.json.JSONArray
@@ -39,6 +42,9 @@ class ProgresoFragment : Fragment() {
     private lateinit var adapter: PacientesAdapter
     private lateinit var progressDialog: ProgressDialog
     private lateinit var requestQueue: RequestQueue
+    private lateinit var buscarPacienteButton: ImageButton
+    private lateinit var dniInput: EditText
+    private lateinit var nombreCompletoInput: EditText
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -118,26 +124,6 @@ class ProgresoFragment : Fragment() {
             datePickerDialog.show()
         }
 
-        // Inicializa el RecyclerView
-        listPacientes = view.findViewById(R.id.ListPacientes)
-        listPacientes.layoutManager = LinearLayoutManager(context)
-
-        // Cargar la lista de pacientes
-        cargarPacientes()
-
-        // Inicializar el SearchView
-        buscadorDNI = view.findViewById(R.id.searchViewDNIReporte)
-
-        buscadorDNI.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                adapter.filter.filter(newText)
-                return true
-            }
-        })
 
         // Vincular el botón de descarga de PDF
         val descargarBtn = view.findViewById<Button>(R.id.Descargar_btn)
@@ -146,7 +132,77 @@ class ProgresoFragment : Fragment() {
             abrirSelectorDeArchivos()
         }
 
+        // Inicializa las vistas
+        dniInput = view.findViewById(R.id.DNIInput)
+        nombreCompletoInput = view.findViewById(R.id.NombreCompletoInput)
+
+        // Inicializa el botón de búsqueda
+        buscarPacienteButton = view.findViewById(R.id.BuscarPaciente)
+        buscarPacienteButton.setOnClickListener {
+            buscarPacientePorDNI()
+        }
+
         return view
+    }
+
+    private fun buscarPacientePorDNI() {
+        progressDialog.show() // Mostrar el loader antes de hacer la petición
+        val dni = dniInput.text.toString().trim() // Obtener el DNI ingresado
+
+        // Validar que el DNI tenga exactamente 8 caracteres
+        if (dni.length != 8) {
+            Toast.makeText(requireContext(), "El DNI debe tener exactamente 8 caracteres", Toast.LENGTH_SHORT).show()
+            progressDialog.dismiss() // Ocultar el loader al mostrar el mensaje
+            return
+        }
+
+        val url = "https://pillpop-backend.onrender.com/obtenerDatosPacientePorDNI"  // Cambia a la URL de tu servidor
+
+        // Crear un objeto JSON para la solicitud
+        val jsonObject = JSONObject().apply {
+            put("dni", dni)  // Asegúrate de que este campo coincida con lo que espera tu servidor
+        }
+
+        // Crear la solicitud POST
+        val stringRequest = object : StringRequest(
+            Method.POST, url,
+            Response.Listener<String> { response ->
+                // Manejar la respuesta del servidor
+                val jsonResponse = JSONObject(response)
+
+                // Verificar si la respuesta contiene el campo "mensaje"
+                if (jsonResponse.has("mensaje")) {
+                    // Si hay un mensaje, es porque no se encontró el paciente
+                    Toast.makeText(requireContext(), jsonResponse.getString("mensaje"), Toast.LENGTH_SHORT).show()
+                    nombreCompletoInput.setText("") // Limpiar el campo si no se encuentra el paciente
+                } else {
+                    // Si la respuesta contiene los datos del paciente
+                    val nombreCompleto = jsonResponse.getString("nombreCompleto") // Extrae el campo nombreCompleto
+
+                    // Llenar los campos en la vista
+                    nombreCompletoInput.setText(nombreCompleto)
+                }
+                progressDialog.dismiss() // Ocultar el loader cuando se complete la carga
+            },
+            Response.ErrorListener { error ->
+                Log.e("Error", "Error al buscar paciente: ${error.message}")
+                nombreCompletoInput.setText("") // Limpiar el campo en caso de error
+                Toast.makeText(requireContext(), "Error al buscar paciente", Toast.LENGTH_SHORT).show()
+                progressDialog.dismiss() // Ocultar el loader cuando se complete la carga
+            }) {
+            override fun getBody(): ByteArray {
+                return jsonObject.toString().toByteArray(Charsets.UTF_8)
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Content-Type"] = "application/json"
+                return headers
+            }
+        }
+
+        // Agregar la solicitud a la cola de solicitudes de Volley
+        requestQueue.add(stringRequest)
     }
 
     private fun abrirSelectorDeArchivos() {
@@ -424,48 +480,6 @@ class ProgresoFragment : Fragment() {
             }
         }
         canvas.drawText(line, x, cellY, paint) // Dibuja la última línea
-    }
-
-    private fun cargarPacientes() {
-        progressDialog.show()
-        val url = "https://pillpop-backend.onrender.com/ObtenerPacientesPorDoctor"
-
-        // Crear el objeto JSON que se enviará como cuerpo de la solicitud
-        val params = JSONObject().apply {
-            put("doctor_id", doctorId)
-        }
-
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.POST,
-            url,
-            params,
-            { response ->
-                val listaPacientes = mutableListOf<Paciente>()
-
-                // Aquí asumimos que la respuesta es un objeto JSON que contiene un array de pacientes
-                val pacientesArray: JSONArray = response.getJSONArray("pacientes")
-
-                for (i in 0 until pacientesArray.length()) {
-                    val jsonObject: JSONObject = pacientesArray.getJSONObject(i)
-                    val id = jsonObject.getInt("id")
-                    val nombre = jsonObject.getString("nombrePaciente")
-                    val dni = jsonObject.getString("dniPaciente")
-                    listaPacientes.add(Paciente(id, nombre, dni))
-                }
-
-                // Inicializa el adaptador con los datos obtenidos
-                adapter = PacientesAdapter(listaPacientes)
-                listPacientes.adapter = adapter
-                progressDialog.dismiss()
-            },
-            { error: VolleyError ->
-                error.printStackTrace()
-                Toast.makeText(requireContext(), "Error al cargar pacientes", Toast.LENGTH_LONG).show()
-                progressDialog.dismiss()
-            }
-        )
-
-        requestQueue.add(jsonObjectRequest)
     }
 
     // Funciones para actualizar campos de fecha

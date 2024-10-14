@@ -233,44 +233,75 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="DNI"
+                android:text="DNI del Paciente"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <SearchView
-                android:id="@+id/searchViewDNIReporte"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginVertical="10dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="2dp"
-                android:background="@drawable/rounded_corners_gris_tab"
-                android:iconifiedByDefault="false"
-                android:paddingEnd="10dp"
-                android:queryHint="Buscar por DNI"
-                android:textColor="@color/white"
-                android:theme="@style/SearchViewStyle"
-                android:backgroundTint="#403F3F"
-                android:elevation="10dp"/>
-
-            <ScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/SrcollPacientes">
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/ListPacientes"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_gravity="center|center_horizontal|center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/DNIInput"
+                    style="@style/Inputs"
+                    android:layout_width="310dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:backgroundTint="#1FB5C0"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text=""
+                    android:textColor="#FFFFFF"
+                    android:layout_marginLeft="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.506"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:listitem="@layout/item_pacientes"/>
-            </ScrollView>
+                    app:layout_constraintTop_toBottomOf="@id/DNIlabel" />
+
+                <ImageButton
+                    android:id="@+id/BuscarPaciente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="6dp"
+                    android:padding="4dp"
+                    android:background="@drawable/rounded_button_turquesa"
+                    app:srcCompat="@drawable/ic_search_white" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/NombreCompletolabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Nombre Completo del Paciente"
+                android:layout_marginLeft="16dp"
+                android:textAppearance="@style/Labels" />
+
+            <EditText
+                android:id="@+id/NombreCompletoInput"
+                style="@style/Inputs"
+                android:layout_width="335dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="#1FB5C0"
+                android:ems="10"
+                android:inputType="text"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:layout_marginLeft="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.506"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/NombreCompletolabel" />
+
         </LinearLayout>
         <LinearLayout
             android:id="@+id/linearLayoutButton"
