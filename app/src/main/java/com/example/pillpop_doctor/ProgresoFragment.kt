@@ -56,35 +56,47 @@ class ProgresoFragment : Fragment() {
 
         val spinnerFrecuenciaTiempo: Spinner = view.findViewById(R.id.FrecuenciaReporteDrop)
         val frecuenciaTiempoList = resources.getStringArray(R.array.frecuencia_reporte_array)
-        val adapterFrecuenciaTiempo = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, frecuenciaTiempoList)
+        val adapterFrecuenciaTiempo = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            frecuenciaTiempoList
+        )
         spinnerFrecuenciaTiempo.adapter = adapterFrecuenciaTiempo
 
         val linearEntreFechas: LinearLayout = view.findViewById(R.id.LinearEntreFechas)
         val linearFechaUnica: LinearLayout = view.findViewById(R.id.LinearfechaUnica)
 
         // Establecer el listener para el Spinner
-        spinnerFrecuenciaTiempo.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                when (parent.getItemAtPosition(position).toString()) {
-                    "Seleccionar..." -> {
-                        linearEntreFechas.visibility = View.GONE
-                        linearFechaUnica.visibility = View.GONE
-                    }
-                    "Diario" -> {
-                        linearEntreFechas.visibility = View.GONE
-                        linearFechaUnica.visibility = View.VISIBLE
-                    }
-                    "Entre Fechas" -> {
-                        linearEntreFechas.visibility = View.VISIBLE
-                        linearFechaUnica.visibility = View.GONE
+        spinnerFrecuenciaTiempo.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    when (parent.getItemAtPosition(position).toString()) {
+                        "Seleccionar..." -> {
+                            linearEntreFechas.visibility = View.GONE
+                            linearFechaUnica.visibility = View.GONE
+                        }
+
+                        "Diario" -> {
+                            linearEntreFechas.visibility = View.GONE
+                            linearFechaUnica.visibility = View.VISIBLE
+                        }
+
+                        "Entre Fechas" -> {
+                            linearEntreFechas.visibility = View.VISIBLE
+                            linearFechaUnica.visibility = View.GONE
+                        }
                     }
                 }
-            }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // No hacer nada
+                override fun onNothingSelected(parent: AdapterView<*>) {
+                    // No hacer nada
+                }
             }
-        }
 
         val calendario = Calendar.getInstance()
         val fecha = DatePickerDialog.OnDateSetListener { _, year, month, day ->
@@ -150,7 +162,11 @@ class ProgresoFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_CREATE_DOCUMENT && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                generarPdf(uri, "Reporte de Progreso", "Este documento contiene el seguimiento del tratamiento médico.")
+                generarPdf(
+                    uri,
+                    "Reporte de Progreso",
+                    "Este documento contiene el seguimiento del tratamiento médico."
+                )
             }
         }
     }
@@ -164,18 +180,25 @@ class ProgresoFragment : Fragment() {
         val tablePaint = Paint()
         val tableTextPaint = TextPaint()
 
-        val paginaInfo = PdfDocument.PageInfo.Builder(816, 1054, 1).create()
-        val pagina1 = pdfDocument.startPage(paginaInfo)
+        var paginaNumber = 1
+        var paginaInfo: PdfDocument.PageInfo
+        lateinit var pagina: PdfDocument.Page
+        lateinit var canvas: Canvas
 
-        val canvas = pagina1.canvas
+        fun startNewPage() {
+            paginaInfo = PdfDocument.PageInfo.Builder(816, 1054, paginaNumber).create()
+            pagina = pdfDocument.startPage(paginaInfo)
+            canvas = pagina.canvas
+            canvas.drawColor(Color.WHITE) // Fondo blanco
+            paginaNumber++
+        }
 
-        // Fondo blanco
-        canvas.drawColor(Color.WHITE)
+        startNewPage() // Inicializa la primera página
 
         // Título
         titulo.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD))
         titulo.textSize = 24f
-        paint.color = Color.BLACK // Cambia el color del texto
+        paint.color = Color.BLACK
         canvas.drawText(tituloText, 10f, 50f, titulo)
 
         // Línea debajo del título
@@ -185,12 +208,18 @@ class ProgresoFragment : Fragment() {
         // Descripción
         descripcion.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL))
         descripcion.textSize = 16f
-        descripcion.color = Color.BLACK // Color del texto normal
+        descripcion.color = Color.BLACK
 
         val arrDescripcion = descripcionText.split("\n")
 
         var y = 100f
         for (item in arrDescripcion) {
+            // Verifica si se necesita una nueva página
+            if (y > 1054 - 20) { // Si se pasa de la altura de la página menos un margen
+                pdfDocument.finishPage(pagina) // Termina la página actual
+                startNewPage() // Crea una nueva página
+                y = 100f // Reinicia la posición vertical
+            }
             canvas.drawText(item, 10f, y, descripcion)
             y += 20
         }
@@ -203,7 +232,7 @@ class ProgresoFragment : Fragment() {
         val doctor = "Doctor: José Perez Cabrera"
         val fecha = "Fecha: 03 de julio del 2024"
 
-        // Estilo para la información en negrita
+        // Títulos y texto normal
         val infoBoldPaint = TextPaint().apply {
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             textSize = 16f
@@ -235,31 +264,41 @@ class ProgresoFragment : Fragment() {
         // Espacio entre la información y la tabla
         y += 40f
 
+        // Tabla de Tratamiento
         canvas.drawText("Tratamiento:", 10f, y, subtitulo)
         y += 20f
 
-        // Tabla de Tratamiento
+        // Inicia la tabla
         tablePaint.color = Color.LTGRAY
         canvas.drawRect(10f, y, 806f, y + 20f, tablePaint)
 
         // Títulos de la tabla
-        tableTextPaint.textSize = 16f
-
         canvas.drawText("Tratamiento", 20f, y + 15f, tableTextPaint)
         canvas.drawText("Dosis", 200f, y + 15f, tableTextPaint)
         canvas.drawText("Duración", 320f, y + 15f, tableTextPaint)
         canvas.drawText("Frecuencia", 440f, y + 15f, tableTextPaint)
         canvas.drawText("Horario", 620f, y + 15f, tableTextPaint)
 
-        // Datos de la tabla (ejemplo, agrega tus datos reales aquí)
+        // Datos de la tabla
         val tratamientos = arrayOf(
             arrayOf("Pastilla 1", "100gr", "2 semanas", "Diaria", "8:00 AM"),
-            arrayOf("Pastilla 2", "100gr", "1 mes", "Dos días seguidos, dejando un día", "10:00 AM"),
+            arrayOf(
+                "Pastilla 2",
+                "100gr",
+                "1 mes",
+                "Dos días seguidos, dejando un día",
+                "10:00 AM"
+            ),
             arrayOf("Pastilla 3", "100gr", "1 mes", "Interdiario", "6:00 PM")
         )
 
         y += 40f
         for (tratamiento in tratamientos) {
+            if (y > 1054 - 20) {
+                pdfDocument.finishPage(pagina)
+                startNewPage()
+                y = 100f
+            }
             drawMultilineText(canvas, tratamiento[0], 20f, y, tableTextPaint, 180f)
             drawMultilineText(canvas, tratamiento[1], 200f, y, tableTextPaint, 80f)
             drawMultilineText(canvas, tratamiento[2], 320f, y, tableTextPaint, 80f)
@@ -269,11 +308,12 @@ class ProgresoFragment : Fragment() {
         }
 
         // Espacio antes del Registro Diario
-        y += 40f
+        y += 30f
 
-        // Registro Diario (ejemplo simple)
+        // Registro Diario
         canvas.drawText("Registro Diario:", 10f, y, subtitulo)
         y += 20f
+
         // Crear tabla de registro diario
         val registroTitulos = arrayOf("Fecha", "Pastilla 1", "Pastilla 2", "Pastilla 3")
         val registros = arrayOf(
@@ -337,19 +377,25 @@ class ProgresoFragment : Fragment() {
 
         for (registro in registros) {
             for (i in registro.indices) {
+                if (y > 1054 - 20) {
+                    pdfDocument.finishPage(pagina)
+                    startNewPage()
+                    y = 100f
+                }
                 canvas.drawText(registro[i], 20f + i * 120f, y + 15f, tableTextPaint)
             }
             y += 30f
         }
 
-        pdfDocument.finishPage(pagina1)
+        pdfDocument.finishPage(pagina)
 
         // Guardar el PDF en el URI proporcionado
         try {
             val outputStream: OutputStream? = requireContext().contentResolver.openOutputStream(uri)
             outputStream?.use {
                 pdfDocument.writeTo(it)
-                Toast.makeText(requireContext(), "Se creó el PDF correctamente", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Se creó el PDF correctamente", Toast.LENGTH_LONG)
+                    .show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
