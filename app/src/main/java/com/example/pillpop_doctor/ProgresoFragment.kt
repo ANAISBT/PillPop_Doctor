@@ -3,36 +3,33 @@ package com.example.pillpop_doctor
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.*
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.text.TextPaint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.pillpop_doctor.databinding.FragmentProgresoBinding
-import org.json.JSONArray
+import com.google.gson.Gson
 import org.json.JSONObject
 import java.io.OutputStream
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class ProgresoFragment : Fragment() {
@@ -52,6 +49,8 @@ class ProgresoFragment : Fragment() {
     private var dniPaciente: String = ""
     private var nombreCompleto: String = ""
     private var frecuenciaSeleccionada: String = ""
+    private lateinit var datosReporte: DatosReporteResponse
+
 
 
     override fun onCreateView(
@@ -186,8 +185,37 @@ class ProgresoFragment : Fragment() {
         val descargarBtn = view.findViewById<Button>(R.id.Descargar_btn)
 
         descargarBtn.setOnClickListener {
-            obtenerDatosReporte()
-            abrirSelectorDeArchivos()
+            // Ejecutar las validaciones
+            if (!validaciones()) return@setOnClickListener  // Salir si hay errores de validación
+
+            doctorId?.let { it1 ->
+                obtenerDatosReporte(this, fechaUnica, it1, dniPaciente,
+                    onSuccess = { reporte ->
+                        this.datosReporte = reporte
+
+                        // Aquí puedes manejar los datos obtenidos
+                        println("Nombre Completo: ${reporte.datosReporte[0].nombreCompleto}")
+                        println("Nombre Mes: ${reporte.datosReporte[0].NombreMes}")
+
+                        // Procesar los tratamientos
+                        for (tratamiento in reporte.tratamiento) {
+                            println("Tratamiento: ${tratamiento.nombrePastilla}, Dosis: ${tratamiento.totalDosis}, Tipo: ${tratamiento.tipo}")
+                        }
+
+                        // Procesar las tomas diarias
+                        for (toma in reporte.tomasDiarias) {
+                            val fechaFormateada = formatearFecha(toma.fecha_toma)
+                            println("Fecha Toma: $fechaFormateada, Nombre: ${toma.nombre}, Toma: ${toma.toma}")
+                        }
+
+                        abrirSelectorDeArchivos(reporte)
+                    },
+                    onError = { errorMessage ->
+                        // Manejar el error
+                        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+                )
+            }
         }
 
 
@@ -200,38 +228,53 @@ class ProgresoFragment : Fragment() {
         return view
     }
 
-    private fun obtenerDatosReporte() {
+    fun formatearFecha(fechaStr: String): String {
+        val formatoEntrada = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        val formatoSalida = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+
+        return try {
+            val fecha: Date = formatoEntrada.parse(fechaStr) ?: return ""
+            formatoSalida.format(fecha)
+        } catch (e: Exception) {
+            // Manejo de errores
+            e.printStackTrace()
+            ""
+        }
+    }
+
+    private fun validaciones(): Boolean {
         // Obtén las fechas y el DNI
         fechaInicio = editTextDateInicio.text.toString()
         fechaFin = editTextDateFin.text.toString()
         fechaUnica = editTextDateUnico.text.toString()
         dniPaciente = dniInput.text.toString()
-        nombreCompleto=nombreCompletoInput.text.toString()
+        nombreCompleto = nombreCompletoInput.text.toString()
 
         val spinnerFrecuenciaTiempo: Spinner = binding.FrecuenciaReporteDrop // Asegúrate de tener acceso al spinner
-
         frecuenciaSeleccionada = spinnerFrecuenciaTiempo.selectedItem.toString()
 
         // Validaciones
         when {
             frecuenciaSeleccionada == "Seleccionar..." -> {
                 Toast.makeText(requireContext(), "Necesita seleccionar un tiempo", Toast.LENGTH_SHORT).show()
-                return // Salimos de la función si no se seleccionó
+                return false // Salimos de la función si no se seleccionó
             }
             frecuenciaSeleccionada == "Diario" && fechaUnica.isEmpty() -> {
                 Toast.makeText(requireContext(), "Para frecuencia diaria, la fecha única no puede estar vacía", Toast.LENGTH_SHORT).show()
-                return
+                return false
             }
             frecuenciaSeleccionada == "Entre Fechas" && (fechaInicio.isEmpty() || fechaFin.isEmpty()) -> {
                 Toast.makeText(requireContext(), "Para frecuencia entre fechas, ambas fechas deben ser seleccionadas", Toast.LENGTH_SHORT).show()
-                return
+                return false
             }
             dniPaciente.isEmpty() || nombreCompleto.isEmpty() -> {
                 Toast.makeText(requireContext(), "Hay que seleccionar un paciente", Toast.LENGTH_SHORT).show()
-                return
+                return false
             }
         }
+        return true // Todas las validaciones fueron exitosas
     }
+
 
     private fun buscarPacientePorDNI() {
         progressDialog.show() // Mostrar el loader antes de hacer la petición
@@ -293,7 +336,68 @@ class ProgresoFragment : Fragment() {
         requestQueue.add(stringRequest)
     }
 
-    private fun abrirSelectorDeArchivos() {
+    fun obtenerDatosReporte(
+        context: Fragment,
+        fechaUnica: String,
+        doctorId: Int,
+        pacienteDni: String,
+        onSuccess: (DatosReporteResponse) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val url = "https://pillpop-backend.onrender.com/reportefechaunica"
+
+        // Convertir fechaUnica a formato yyyy-MM-dd
+        val formatoEntrada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formatoSalida = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        val fechaConvertida: String
+        try {
+            val fecha = formatoEntrada.parse(fechaUnica)
+            fechaConvertida = formatoSalida.format(fecha)
+        } catch (e: Exception) {
+            onError("Error al formatear la fecha: ${e.message}")
+            return
+        }
+
+
+        // Crear el objeto JSON con los parámetros que se enviarán
+        val jsonObject = JSONObject().apply {
+            put("fechaUnica", fechaConvertida)
+            put("doctorId", doctorId)
+            put("pacienteDni", pacienteDni)
+        }
+
+        // Crear la cola de solicitudes
+        val queue: RequestQueue = Volley.newRequestQueue(context.requireContext()) // Usar requireContext()
+
+        // Crear solicitud JSON a la API
+        val jsonObjectRequest = object : JsonObjectRequest(
+            Request.Method.POST, url, jsonObject,
+            { response ->
+                try {
+                    // Convertir la respuesta en el modelo de datos
+                    val datosReporte = Gson().fromJson(response.toString(), DatosReporteResponse::class.java)
+                    onSuccess(datosReporte)
+                } catch (e: Exception) {
+                    onError("Error al procesar la respuesta: ${e.message}")
+                }
+            },
+            { error ->
+                onError("Error en la solicitud: ${error.message}")
+            }
+        ) {
+            // Sobreescribir el método getHeaders para establecer encabezados
+            override fun getHeaders(): Map<String, String> {
+                return mapOf("Content-Type" to "application/json")
+            }
+        }
+
+        // Añadir la solicitud a la cola
+        queue.add(jsonObjectRequest)
+    }
+
+
+    private fun abrirSelectorDeArchivos(datosReporte: DatosReporteResponse) {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "application/pdf"
@@ -302,6 +406,7 @@ class ProgresoFragment : Fragment() {
         startActivityForResult(intent, REQUEST_CODE_CREATE_DOCUMENT)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_CREATE_DOCUMENT && resultCode == AppCompatActivity.RESULT_OK) {
@@ -309,13 +414,30 @@ class ProgresoFragment : Fragment() {
                 generarPdf(
                     uri,
                     "Reporte de Progreso",
-                    "Este documento contiene el seguimiento del tratamiento médico."
+                    "Este documento contiene el seguimiento del tratamiento médico.",
+                    datosReporte
                 )
             }
         }
     }
 
-    fun generarPdf(uri: Uri, tituloText: String, descripcionText: String) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun convertirFechaCorrida(fecha: String): String {
+        // Definir el formato de entrada
+        val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+        // Parsear la fecha de entrada
+        val date = LocalDate.parse(fecha, inputFormatter)
+
+        // Definir el formato de salida
+        val outputFormatter = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+
+        // Formatear la fecha a la salida deseada
+        return date.format(outputFormatter)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun generarPdf(uri: Uri, tituloText: String, descripcionText: String, datosReporte: DatosReporteResponse) {
         val pdfDocument = PdfDocument()
         val paint = Paint()
         val titulo = TextPaint()
@@ -371,10 +493,6 @@ class ProgresoFragment : Fragment() {
         // Espacio entre la descripción y la tabla
         y += 20f
 
-        // Información del mes, doctor y fecha
-        val mes = "Mes: Junio"
-        val doctor = "Doctor: José Perez Cabrera"
-        val fecha = "Fecha: 03 de julio del 2024"
 
         // Títulos y texto normal
         val infoBoldPaint = TextPaint().apply {
@@ -397,13 +515,13 @@ class ProgresoFragment : Fragment() {
         y += 40f
 
         canvas.drawText("Mes:", 10f, y, infoBoldPaint)
-        canvas.drawText("Junio", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        canvas.drawText("${datosReporte.datosReporte[0].NombreMes}", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
         y += 20f
         canvas.drawText("Doctor:", 10f, y, infoBoldPaint)
-        canvas.drawText("José Perez Cabrera", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        canvas.drawText("${datosReporte.datosReporte[0].nombreCompleto}", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
         y += 20f
         canvas.drawText("Fecha:", 10f, y, infoBoldPaint)
-        canvas.drawText("03 de julio del 2024", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        canvas.drawText("${convertirFechaCorrida(fechaUnica)}", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
 
         // Espacio entre la información y la tabla
         y += 40f
@@ -419,35 +537,18 @@ class ProgresoFragment : Fragment() {
         // Títulos de la tabla
         canvas.drawText("Tratamiento", 20f, y + 15f, tableTextPaint)
         canvas.drawText("Dosis", 200f, y + 15f, tableTextPaint)
-        canvas.drawText("Duración", 320f, y + 15f, tableTextPaint)
         canvas.drawText("Frecuencia", 440f, y + 15f, tableTextPaint)
-        canvas.drawText("Horario", 620f, y + 15f, tableTextPaint)
-
-        // Datos de la tabla
-        val tratamientos = arrayOf(
-            arrayOf("Pastilla 1", "100gr", "2 semanas", "Diaria", "8:00 AM"),
-            arrayOf(
-                "Pastilla 2",
-                "100gr",
-                "1 mes",
-                "Dos días seguidos, dejando un día",
-                "10:00 AM"
-            ),
-            arrayOf("Pastilla 3", "100gr", "1 mes", "Interdiario", "6:00 PM")
-        )
 
         y += 40f
-        for (tratamiento in tratamientos) {
+        for (tratamiento in datosReporte.tratamiento) {
             if (y > 1054 - 20) {
                 pdfDocument.finishPage(pagina)
                 startNewPage()
                 y = 100f
             }
-            drawMultilineText(canvas, tratamiento[0], 20f, y, tableTextPaint, 180f)
-            drawMultilineText(canvas, tratamiento[1], 200f, y, tableTextPaint, 80f)
-            drawMultilineText(canvas, tratamiento[2], 320f, y, tableTextPaint, 80f)
-            drawMultilineText(canvas, tratamiento[3], 440f, y, tableTextPaint, 140f)
-            drawMultilineText(canvas, tratamiento[4], 620f, y, tableTextPaint, 100f)
+            drawMultilineText(canvas, tratamiento.nombrePastilla, 20f, y, tableTextPaint, 180f)
+            drawMultilineText(canvas, tratamiento.totalDosis, 200f, y, tableTextPaint, 80f)
+            drawMultilineText(canvas, tratamiento.tipo, 440f, y, tableTextPaint, 140f)
             y += 50f
         }
 
@@ -458,80 +559,75 @@ class ProgresoFragment : Fragment() {
         canvas.drawText("Registro Diario:", 10f, y, subtitulo)
         y += 20f
 
-        // Crear tabla de registro diario
-        val registroTitulos = arrayOf("Fecha", "Pastilla 1", "Pastilla 2", "Pastilla 3")
-        val registros = arrayOf(
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔"),
-            arrayOf("01/07/2024", "✔", "✖", "✔"),
-            arrayOf("02/07/2024", "✔", "✔", "✖"),
-            arrayOf("03/07/2024", "✖", "✖", "✔")
-        )
+        val registros2 = datosReporte.tomasDiarias
 
-        // Dibujar títulos de la tabla
+// Crear tabla de registro diario
+// Extraer nombres de pastillas únicos
+        val nombresPastillas = registros2.map { it.nombre }.distinct()
+
+// Crear registroTitulos dinámicamente
+        val registroTitulos = arrayOf("Fecha") + nombresPastillas.toTypedArray()
+
+// Imprimir el resultado
+        println(registroTitulos.joinToString(", "))
+
+// Crear cuerpo de la tabla
+        val cuerpoTabla = mutableListOf<Array<String>>()
+
+        // Crear el formateador de fechas
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("UTC") // Establecer zona horaria a UTC
+        }
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy hh:mm aa", Locale.getDefault()) // Formato deseado
+
+// Agrupar tomas por fecha
+        val tomasAgrupadasPorFecha = registros2.groupBy { it.fecha_toma }
+
+        for ((fecha, tomas) in tomasAgrupadasPorFecha) {
+            // Inicializar una fila para la fecha actual
+            val fila = Array(nombresPastillas.size + 1) { "" }
+            // Parsear la fecha y formatearla
+            val parsedDate = inputFormat.parse(fecha)
+            fila[0] =
+                parsedDate?.let { outputFormat.format(it) }.toString() // Asignar fecha formateada a la primera columna
+
+
+            // Llenar las columnas de pastillas
+            for (toma in tomas) {
+                val indice = nombresPastillas.indexOf(toma.nombre) + 1 // +1 para ignorar la columna de fecha
+                if (indice > 0) {
+                    fila[indice] = if (toma.toma == 1) "✔" else "✖"
+                }
+            }
+
+            cuerpoTabla.add(fila)
+        }
+
+// Dibujar títulos de la tabla
         tablePaint.color = Color.LTGRAY
         canvas.drawRect(10f, y, 806f, y + 20f, tablePaint)
 
         for (i in registroTitulos.indices) {
-            canvas.drawText(registroTitulos[i], 20f + i * 120f, y + 15f, tableTextPaint)
+            canvas.drawText(registroTitulos[i], 20f + i * 140f, y + 15f, tableTextPaint)
         }
 
-        // Espacio para los registros
+// Espacio para los registros
         y += 30f
 
-        for (registro in registros) {
+        for (registro in cuerpoTabla) {
             for (i in registro.indices) {
                 if (y > 1054 - 20) {
                     pdfDocument.finishPage(pagina)
                     startNewPage()
                     y = 100f
                 }
-                canvas.drawText(registro[i], 20f + i * 120f, y + 15f, tableTextPaint)
+                canvas.drawText(registro[i], 20f + i * 140f, y + 20f, tableTextPaint)
             }
             y += 30f
         }
 
         pdfDocument.finishPage(pagina)
+
 
         // Guardar el PDF en el URI proporcionado
         try {
