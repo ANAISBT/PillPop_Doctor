@@ -133,7 +133,7 @@ class ProgresoFragment : Fragment() {
         }
 
         val calendarioInicio = Calendar.getInstance()
-        val fechaInicio = DatePickerDialog.OnDateSetListener { _, year, month, day ->
+        val fechaInicio2 = DatePickerDialog.OnDateSetListener { _, year, month, day ->
             calendarioInicio.set(Calendar.YEAR, year)
             calendarioInicio.set(Calendar.MONTH, month)
             calendarioInicio.set(Calendar.DAY_OF_MONTH, day)
@@ -144,7 +144,7 @@ class ProgresoFragment : Fragment() {
         binding.fechaPickBtnInicio.setOnClickListener {
             val datePickerDialog = DatePickerDialog(
                 requireActivity(),
-                fechaInicio,
+                fechaInicio2,
                 calendarioInicio.get(Calendar.YEAR),
                 calendarioInicio.get(Calendar.MONTH),
                 calendarioInicio.get(Calendar.DAY_OF_MONTH)
@@ -154,7 +154,7 @@ class ProgresoFragment : Fragment() {
         }
 
         val calendarioFin = Calendar.getInstance()
-        val fechaFin = DatePickerDialog.OnDateSetListener { _, year, month, day ->
+        val fechaFin2 = DatePickerDialog.OnDateSetListener { _, year, month, day ->
             calendarioFin.set(Calendar.YEAR, year)
             calendarioFin.set(Calendar.MONTH, month)
             calendarioFin.set(Calendar.DAY_OF_MONTH, day)
@@ -165,7 +165,7 @@ class ProgresoFragment : Fragment() {
         binding.fechaPickBtnFin.setOnClickListener {
             val datePickerDialog = DatePickerDialog(
                 requireActivity(),
-                fechaFin,
+                fechaFin2,
                 calendarioFin.get(Calendar.YEAR),
                 calendarioFin.get(Calendar.MONTH),
                 calendarioFin.get(Calendar.DAY_OF_MONTH)
@@ -188,34 +188,70 @@ class ProgresoFragment : Fragment() {
             // Ejecutar las validaciones
             if (!validaciones()) return@setOnClickListener  // Salir si hay errores de validación
 
-            doctorId?.let { it1 ->
-                obtenerDatosReporte(this, fechaUnica, it1, dniPaciente,
-                    onSuccess = { reporte ->
-                        this.datosReporte = reporte
+            // Asumiendo que frecuenciaSeleccionada es una variable que contiene el valor correspondiente
+            if (frecuenciaSeleccionada == "Diario") {
+                doctorId?.let { it1 ->
+                    obtenerDatosReporte(this, fechaUnica, it1, dniPaciente,
+                        onSuccess = { reporte ->
+                            this.datosReporte = reporte
 
-                        // Aquí puedes manejar los datos obtenidos
-                        println("Nombre Completo: ${reporte.datosReporte[0].nombreCompleto}")
-                        println("Nombre Mes: ${reporte.datosReporte[0].NombreMes}")
+                            // Aquí puedes manejar los datos obtenidos
+                            println("Nombre Completo: ${reporte.datosReporte[0].nombreCompleto}")
+                            println("Nombre Mes: ${reporte.datosReporte[0].NombreMes}")
 
-                        // Procesar los tratamientos
-                        for (tratamiento in reporte.tratamiento) {
-                            println("Tratamiento: ${tratamiento.nombrePastilla}, Dosis: ${tratamiento.totalDosis}, Tipo: ${tratamiento.tipo}")
+                            // Procesar los tratamientos
+                            for (tratamiento in reporte.tratamiento) {
+                                println("Tratamiento: ${tratamiento.nombrePastilla}, Dosis: ${tratamiento.totalDosis}, Tipo: ${tratamiento.tipo}")
+                            }
+
+                            // Procesar las tomas diarias
+                            for (toma in reporte.tomasDiarias) {
+                                val fechaFormateada = formatearFecha(toma.fecha_toma)
+                                println("Fecha Toma: $fechaFormateada, Nombre: ${toma.nombre}, Toma: ${toma.toma}")
+                            }
+
+                            abrirSelectorDeArchivos(reporte)
+                        },
+                        onError = { errorMessage ->
+                            // Manejar el error
+                            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
                         }
+                    )
+                }
+            } else if (frecuenciaSeleccionada == "Entre Fechas") {
+                // Suponiendo que tienes las variables fechaInicio, fechaFin y otros necesarios
+                doctorId?.let { it1 ->
+                    obtenerDatosReporteEntreFechas(this, fechaInicio, fechaFin, it1, dniPaciente,
+                        onSuccess = { reporte ->
+                            this.datosReporte = reporte
 
-                        // Procesar las tomas diarias
-                        for (toma in reporte.tomasDiarias) {
-                            val fechaFormateada = formatearFecha(toma.fecha_toma)
-                            println("Fecha Toma: $fechaFormateada, Nombre: ${toma.nombre}, Toma: ${toma.toma}")
+                            // Aquí puedes manejar los datos obtenidos
+                            // Por ejemplo, procesar datosReporte y tratamientos como antes
+                            for (reporteItem in reporte.datosReporte) {
+                                println("Nombre Completo: ${reporteItem.nombreCompleto}")
+                                println("Nombre Mes: ${reporteItem.NombreMes}")
+                            }
+
+                            // Procesar los tratamientos
+                            for (tratamiento in reporte.tratamiento) {
+                                println("Tratamiento: ${tratamiento.nombrePastilla}, Dosis: ${tratamiento.totalDosis}, Tipo: ${tratamiento.tipo}")
+                            }
+
+                            // Procesar las tomas diarias
+                            for (toma in reporte.tomasDiarias) {
+                                val fechaFormateada = formatearFecha(toma.fecha_toma)
+                                println("Fecha Toma: $fechaFormateada, Nombre: ${toma.nombre}, Toma: ${toma.toma}")
+                            }
+
+                            abrirSelectorDeArchivos(reporte)
                         }
-
-                        abrirSelectorDeArchivos(reporte)
-                    },
-                    onError = { errorMessage ->
+                    ) { errorMessage ->
                         // Manejar el error
                         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
                     }
-                )
+                }
             }
+
         }
 
 
@@ -396,6 +432,124 @@ class ProgresoFragment : Fragment() {
         queue.add(jsonObjectRequest)
     }
 
+    fun obtenerDatosReporteEntreFechas(
+        context: Fragment,
+        fechaInicio: String,
+        fechaFin: String,
+        doctorId: Int,
+        pacienteDni: String,
+        onSuccess: (DatosReporteResponse) -> Unit, // Cambia el tipo de onSuccess a List<Reporte>
+        onError: (String) -> Unit
+    ) {
+        val url = "https://pillpop-backend.onrender.com/reporteentrefechas"
+
+        // Convertir las fechas a formato yyyy-MM-dd
+        val formatoEntrada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formatoSalida = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        val fechaInicioConvertida: String
+        val fechaFinConvertida: String
+
+        try {
+            val fechaInicioParsed = formatoEntrada.parse(fechaInicio)
+            val fechaFinParsed = formatoEntrada.parse(fechaFin)
+
+            fechaInicioConvertida = formatoSalida.format(fechaInicioParsed)
+            fechaFinConvertida = formatoSalida.format(fechaFinParsed)
+        } catch (e: Exception) {
+            onError("Error al formatear las fechas: ${e.message}")
+            return
+        }
+
+        // Crear el objeto JSON con los parámetros que se enviarán
+        val jsonObject = JSONObject().apply {
+            put("fechaInicio", fechaInicioConvertida)
+            put("fechaFin", fechaFinConvertida)
+            put("doctorId", doctorId)
+            put("pacienteDni", pacienteDni)
+        }
+
+        // Crear la cola de solicitudes
+        val queue: RequestQueue = Volley.newRequestQueue(context.requireContext()) // Usar requireContext()
+
+        // Crear solicitud JSON a la API
+        val jsonObjectRequest = object : JsonObjectRequest(
+            Request.Method.POST, url, jsonObject,
+            { response ->
+                try {
+                    // Convertir la respuesta en el modelo de datos
+                    val datosReporteList = response.getJSONArray("datosReporte")
+                    val datosReporte = mutableListOf<Reporte>()
+
+                    for (i in 0 until datosReporteList.length()) {
+                        val item = datosReporteList.getJSONObject(i)
+                        val nombreMes = "${item.getString("NombreMesInicio")} - ${item.getString("NombreMesFin")}"
+                        val reporte = Reporte(
+                            nombreCompleto = item.getString("nombreCompleto"),
+                            NombreMes = nombreMes,
+                            fecha = "" // Puedes ajustar esto según sea necesario
+                        )
+                        datosReporte.add(reporte)
+                    }
+
+                    // Procesar tratamiento
+                    val tratamientoList = response.getJSONArray("tratamiento")
+                    val tratamiento = mutableListOf<Tratamiento>()
+
+                    for (i in 0 until tratamientoList.length()) {
+                        val item = tratamientoList.getJSONObject(i)
+                        val tratamientoItem = Tratamiento(
+                            id = item.getInt("id"),
+                            nombrePastilla = item.getString("nombrePastilla"),
+                            totalDosis = item.getString("totalDosis"),
+                            tipo = item.getString("tipo")
+                        )
+                        tratamiento.add(tratamientoItem)
+                    }
+
+                    // Procesar tomasDiarias
+                    val tomasDiariasList = response.getJSONArray("tomasDiarias")
+                    val tomasDiarias = mutableListOf<TomaDiaria>()
+
+                    for (i in 0 until tomasDiariasList.length()) {
+                        val item = tomasDiariasList.getJSONObject(i)
+                        val tomaDiaria = TomaDiaria(
+                            fecha_toma = item.getString("fecha_toma"),
+                            toma = item.getInt("toma"),
+                            id = item.getInt("id"),
+                            nombre = item.getString("nombre")
+                        )
+                        tomasDiarias.add(tomaDiaria)
+                    }
+
+                    // Crear el objeto DatosReporteResponse
+                    val datosReporteResponse = DatosReporteResponse(
+                        datosReporte = datosReporte,
+                        tratamiento = tratamiento,
+                        tomasDiarias = tomasDiarias
+                    )
+
+                    onSuccess(datosReporteResponse)
+                } catch (e: Exception) {
+                    onError("Error al procesar la respuesta: ${e.message}")
+                }
+            },
+            { error ->
+                onError("Error en la solicitud: ${error.message}")
+            }
+        ) {
+            // Sobreescribir el método getHeaders para establecer encabezados
+            override fun getHeaders(): Map<String, String> {
+                return mapOf("Content-Type" to "application/json")
+            }
+        }
+
+        // Añadir la solicitud a la cola
+        queue.add(jsonObjectRequest)
+    }
+
+
+
 
     private fun abrirSelectorDeArchivos(datosReporte: DatosReporteResponse) {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -574,11 +728,15 @@ class ProgresoFragment : Fragment() {
 // Crear cuerpo de la tabla
         val cuerpoTabla = mutableListOf<Array<String>>()
 
-        // Crear el formateador de fechas
+/// Formato de entrada
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
-            timeZone = TimeZone.getTimeZone("UTC") // Establecer zona horaria a UTC
+            timeZone = TimeZone.getTimeZone("UTC") // Establece la zona horaria adecuada
         }
-        val outputFormat = SimpleDateFormat("dd/MM/yyyy hh:mm aa", Locale.getDefault()) // Formato deseado
+
+// Formato de salida
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault()).apply {
+            timeZone = TimeZone.getDefault() // Establece la zona horaria local
+        }
 
 // Agrupar tomas por fecha
         val tomasAgrupadasPorFecha = registros2.groupBy { it.fecha_toma }
@@ -587,9 +745,14 @@ class ProgresoFragment : Fragment() {
             // Inicializar una fila para la fecha actual
             val fila = Array(nombresPastillas.size + 1) { "" }
             // Parsear la fecha y formatearla
-            val parsedDate = inputFormat.parse(fecha)
-            fila[0] =
-                parsedDate?.let { outputFormat.format(it) }.toString() // Asignar fecha formateada a la primera columna
+            val parsedDate: Date? = inputFormat.parse(fecha)
+
+            // Asegúrate de que la fecha se haya parseado correctamente
+            if (parsedDate != null) {
+                fila[0] = outputFormat.format(parsedDate) // Asignar fecha formateada a la primera columna
+            } else {
+                fila[0] = "Fecha no válida" // Manejo de error si la fecha no se parsea
+            }
 
 
             // Llenar las columnas de pastillas
