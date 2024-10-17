@@ -128,7 +128,7 @@ class ProgresoFragment : Fragment() {
                 calendario.get(Calendar.MONTH),
                 calendario.get(Calendar.DAY_OF_MONTH)
             )
-            datePickerDialog.datePicker.minDate = calendario.timeInMillis
+            //datePickerDialog.datePicker.minDate = calendario.timeInMillis
             datePickerDialog.show()
         }
 
@@ -149,7 +149,7 @@ class ProgresoFragment : Fragment() {
                 calendarioInicio.get(Calendar.MONTH),
                 calendarioInicio.get(Calendar.DAY_OF_MONTH)
             )
-            datePickerDialog.datePicker.minDate = calendarioInicio.timeInMillis
+            //datePickerDialog.datePicker.minDate = calendarioInicio.timeInMillis
             datePickerDialog.show()
         }
 
