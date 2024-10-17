@@ -668,17 +668,30 @@ class ProgresoFragment : Fragment() {
         subtitulo.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD))
         subtitulo.textSize = 20f
 
+        // Obtén la fecha actual
+        val fechaHoy = LocalDate.now()
+
+        // Formato de fecha deseado
+        val formatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy")
+        val fechaFormateada = fechaHoy.format(formatter)
+
         canvas.drawText("Datos de Reporte:", 10f, y, subtitulo)
         y += 40f
 
         canvas.drawText("Mes:", 10f, y, infoBoldPaint)
-        canvas.drawText("${datosReporte.datosReporte[0].NombreMes}", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        canvas.drawText("${datosReporte.datosReporte[0].NombreMes}", 200f, y, infoNormalPaint) // Añadiendo el valor en normal
         y += 20f
         canvas.drawText("Doctor:", 10f, y, infoBoldPaint)
-        canvas.drawText("${datosReporte.datosReporte[0].nombreCompleto}", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        canvas.drawText("${datosReporte.datosReporte[0].nombreCompleto}", 200f, y, infoNormalPaint) // Añadiendo el valor en normal
         y += 20f
         canvas.drawText("Fecha:", 10f, y, infoBoldPaint)
-        canvas.drawText("${convertirFechaCorrida(fechaUnica)}", 100f, y, infoNormalPaint) // Añadiendo el valor en normal
+        canvas.drawText(fechaFormateada, 200f, y, infoNormalPaint) // Añadiendo el valor en normal
+        y += 20f
+        canvas.drawText("DNI del Paciente:", 10f, y, infoBoldPaint)
+        canvas.drawText(dniPaciente, 200f, y, infoNormalPaint) // Añadiendo el valor en normal
+        y += 20f
+        canvas.drawText("Nombre del Paciente:", 10f, y, infoBoldPaint)
+        canvas.drawText(nombreCompleto, 200f, y, infoNormalPaint) // Añadiendo el valor en normal
 
         // Espacio entre la información y la tabla
         y += 40f
