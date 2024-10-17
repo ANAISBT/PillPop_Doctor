@@ -129,6 +129,7 @@ class ProgresoFragment : Fragment() {
                 calendario.get(Calendar.DAY_OF_MONTH)
             )
             //datePickerDialog.datePicker.minDate = calendario.timeInMillis
+            datePickerDialog.datePicker.maxDate = calendario.timeInMillis
             datePickerDialog.show()
         }
 
@@ -150,6 +151,7 @@ class ProgresoFragment : Fragment() {
                 calendarioInicio.get(Calendar.DAY_OF_MONTH)
             )
             //datePickerDialog.datePicker.minDate = calendarioInicio.timeInMillis
+            datePickerDialog.datePicker.maxDate = calendario.timeInMillis
             datePickerDialog.show()
         }
 
@@ -171,6 +173,7 @@ class ProgresoFragment : Fragment() {
                 calendarioFin.get(Calendar.DAY_OF_MONTH)
             )
             datePickerDialog.datePicker.minDate = calendarioInicio.timeInMillis
+            datePickerDialog.datePicker.maxDate = calendario.timeInMillis
             datePickerDialog.show()
         }
 
