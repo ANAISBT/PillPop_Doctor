@@ -98,7 +98,7 @@ class LoginView : AppCompatActivity() {
                     val mensaje = response.getString("mensaje")
                     if (mensaje == "Login exitoso") {
                         doctorId = response.getInt("id")
-                        Toast.makeText(this, "Login exitoso, ID: $doctorId", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Login exitoso", Toast.LENGTH_SHORT).show()
 
                         // Navegar a la vista de bienvenida o la siguiente pantalla
                         val intent = Intent(this, BienvenidoView::class.java)
@@ -107,7 +107,7 @@ class LoginView : AppCompatActivity() {
                         Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(this, "Error en la respuesta: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Ocurrió un inconveniente, intente nuevamente", Toast.LENGTH_SHORT).show()
                 }finally {
                     progressDialog.dismiss()
                 }
@@ -126,7 +126,7 @@ class LoginView : AppCompatActivity() {
                     progressDialog.dismiss()
                 } else {
                     Log.e("VolleyError", "Error: ${error.message}")
-                    Toast.makeText(this, "Error de conexión: ${error.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Error de conexión", Toast.LENGTH_LONG).show()
                     progressDialog.dismiss()
                 }
             }

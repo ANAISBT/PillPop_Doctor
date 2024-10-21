@@ -235,11 +235,17 @@ class EditarPastillaView : AppCompatActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace() // Manejar excepción de parsing JSON
                     progressDialog.dismiss() // Ocultar el loader en caso de error
+                    // Redirigir a la vista anterior
+                    Toast.makeText(this, "No se pudieron cargar las frecuencias. Intente nuevamente.", Toast.LENGTH_SHORT).show()
+                    finish()
                 }
             },
             { error ->
                 error.printStackTrace() // Manejar el error de la solicitud
                 progressDialog.dismiss() // Ocultar el loader en caso de error
+                // Redirigir a la vista anterior
+                Toast.makeText(this, "No se pudieron cargar las frecuencias. Intente nuevamente.", Toast.LENGTH_SHORT).show()
+                finish()
             }
         )
 

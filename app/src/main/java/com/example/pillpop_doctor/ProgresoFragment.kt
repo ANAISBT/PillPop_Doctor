@@ -357,7 +357,7 @@ class ProgresoFragment : Fragment() {
             Response.ErrorListener { error ->
                 Log.e("Error", "Error al buscar paciente: ${error.message}")
                 nombreCompletoInput.setText("") // Limpiar el campo en caso de error
-                Toast.makeText(requireContext(), "Error al buscar paciente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error al buscar paciente. Intente nuevamente", Toast.LENGTH_SHORT).show()
                 progressDialog.dismiss() // Ocultar el loader cuando se complete la carga
             }) {
             override fun getBody(): ByteArray {
@@ -550,8 +550,6 @@ class ProgresoFragment : Fragment() {
         // Añadir la solicitud a la cola
         queue.add(jsonObjectRequest)
     }
-
-
 
 
     private fun abrirSelectorDeArchivos(datosReporte: DatosReporteResponse) {

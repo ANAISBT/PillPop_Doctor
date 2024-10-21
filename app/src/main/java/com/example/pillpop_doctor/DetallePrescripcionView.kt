@@ -102,7 +102,6 @@ class DetallePrescripcionView : AppCompatActivity() {
     }
 
     private fun buscarPacientePorDNI() {
-        progressDialog.show() // Mostrar el loader antes de hacer la petición
         val dni = dniInput.text.toString().trim() // Obtener el DNI ingresado
 
         // Validar que el DNI tenga exactamente 8 caracteres
@@ -111,6 +110,8 @@ class DetallePrescripcionView : AppCompatActivity() {
             return
         }
 
+        progressDialog.setMessage("Buscando Paciente")
+        progressDialog.show() // Mostrar el loader antes de hacer la petición
         val url = "https://pillpop-backend.onrender.com/obtenerDatosPacientePorDNI"  // Cambia a la URL de tu servidor
 
         // Crear un objeto JSON para la solicitud
@@ -141,7 +142,7 @@ class DetallePrescripcionView : AppCompatActivity() {
             Response.ErrorListener { error ->
                 Log.e("Error", "Error al buscar paciente: ${error.message}")
                 nombreCompletoInput.setText("") // Limpiar el campo en caso de error
-                Toast.makeText(this, "Error al buscar paciente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al buscar paciente. Intente nuevamente", Toast.LENGTH_SHORT).show()
                 progressDialog.dismiss() // Ocultar el loader cuando se complete la carga
             }) {
             override fun getBody(): ByteArray {
@@ -196,6 +197,8 @@ class DetallePrescripcionView : AppCompatActivity() {
             put("p_fecha", obtenerFechaActual())  // Asegúrate de que esta función esté implementada
         }
 
+        progressDialog.setMessage("Guardando Prescripción")
+        progressDialog.show()
         // Crear la solicitud POST
         val stringRequest = object : StringRequest(Method.POST, url,
             Response.Listener<String> { response ->
@@ -207,10 +210,12 @@ class DetallePrescripcionView : AppCompatActivity() {
                 Log.d("Success", "$mensaje, ID: $prescripcionId")
                 // Llamar al método para insertar las pastillas
                 insertarPastillas(prescripcionId)
+                progressDialog.dismiss() // Ocultar el loader
             },
             Response.ErrorListener { error ->
                 Log.e("Error", "Error al agregar prescripción: ${error.message}")
                 Toast.makeText(this, "No se pudo agregar la prescripcion, intente de nuevo", Toast.LENGTH_SHORT).show()
+                progressDialog.dismiss() // Ocultar el loader
             }) {
             override fun getBody(): ByteArray {
                 return jsonObject.toString().toByteArray(Charsets.UTF_8)

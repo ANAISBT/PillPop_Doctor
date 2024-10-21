@@ -28,11 +28,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
         android:fontFamily="sans-serif-medium"
-        android:text="DNI"
+        android:text="Ingrese su DNI"
         android:textAppearance="@style/Labels"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.107"
+        app:layout_constraintHorizontal_bias="0.139"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/IniciarSesionText" />
 
@@ -54,11 +54,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Contraseña"
+        android:text="Ingrese su Contraseña"
         android:textAppearance="@style/Labels"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.125"
+        app:layout_constraintHorizontal_bias="0.177"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/DNIInput" />
 

@@ -161,7 +161,7 @@ class EditarPrescripcionView : AppCompatActivity() {
             },
             Response.ErrorListener { error ->
                 Log.e("Error", "Error al editar la prescripción: ${error.message}")
-                Toast.makeText(this, "Error al editar la prescripción", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al editar la prescripción. Intente nuevamente", Toast.LENGTH_SHORT).show()
                 progressDialog3.dismiss()
             }) {
             override fun getBody(): ByteArray {
@@ -315,7 +315,7 @@ class EditarPrescripcionView : AppCompatActivity() {
     }
 
     private fun buscarPacientePorDNI() {
-        progressDialog.show() // Mostrar el loader antes de hacer la petición
+
         val dni = dniInput.text.toString().trim() // Obtener el DNI ingresado
 
         // Validar que el DNI tenga exactamente 8 caracteres
@@ -323,7 +323,7 @@ class EditarPrescripcionView : AppCompatActivity() {
             Toast.makeText(this, "El DNI debe tener exactamente 8 caracteres", Toast.LENGTH_SHORT).show()
             return
         }
-
+        progressDialog.show() // Mostrar el loader antes de hacer la petición
         val url = "https://pillpop-backend.onrender.com/obtenerDatosPacientePorDNI"  // Cambia a la URL de tu servidor
 
         // Crear un objeto JSON para la solicitud

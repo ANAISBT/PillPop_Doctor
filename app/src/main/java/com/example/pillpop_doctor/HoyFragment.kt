@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SearchView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
@@ -28,7 +29,6 @@ class HoyFragment : Fragment() {
     private lateinit var listPrescripcionesHoy: RecyclerView
     private lateinit var adapter: PrescripcionesAdapter
     private lateinit var agregarBtn: Button
-    //private val doctorId = 1 // Cambia esto según sea necesario
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,7 +95,14 @@ class HoyFragment : Fragment() {
         val url = "https://pillpop-backend.onrender.com/obtenerPrescripcionesXDoctorFecha"
 
         val queue = Volley.newRequestQueue(requireContext())
-        val fechaHoy: String = SimpleDateFormat("yyyy-MM-dd", Locale("es", "ES")).format(Calendar.getInstance().time)
+        val fechaHoy = try {
+            SimpleDateFormat("yyyy-MM-dd", Locale("es", "ES")).format(Calendar.getInstance().time)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            "" // Devuelve una fecha vacía si ocurre un error (manejo básico)
+        }
+
+
         // Crear el objeto JSON con los parámetros
         val requestBody = mapOf("doctorId" to doctorId, "fechaHoy" to fechaHoy)
 
@@ -103,23 +110,28 @@ class HoyFragment : Fragment() {
             Request.Method.POST, url, null,
             { response ->
                 val prescripcionesList = mutableListOf<Prescripcion>()
-                for (i in 0 until response.length()) {
-                    val jsonObject = response.getJSONObject(i)
-                    val prescripcion = Prescripcion(
-                        jsonObject.getInt("prescripcionId"),
-                        jsonObject.getString("nombreCompleto"),
-                        jsonObject.getInt("dni"),
-                        jsonObject.getString("fecha")
-                    )
-                    prescripcionesList.add(prescripcion)
+                if (response.length() == 0) {
+                    Toast.makeText(context, "No hay prescripciones para hoy.", Toast.LENGTH_SHORT).show()
+                } else {
+                    for (i in 0 until response.length()) {
+                        val jsonObject = response.getJSONObject(i)
+                        val prescripcion = Prescripcion(
+                            jsonObject.getInt("prescripcionId"),
+                            jsonObject.getString("nombreCompleto"),
+                            jsonObject.getInt("dni"),
+                            jsonObject.getString("fecha")
+                        )
+                        prescripcionesList.add(prescripcion)
+                    }
+                    // Actualiza el adapter con la lista obtenida
+                    adapter = PrescripcionesAdapter(prescripcionesList)
+                    listPrescripcionesHoy.adapter = adapter
                 }
-                // Actualiza el adapter con la lista obtenida
-                adapter = PrescripcionesAdapter(prescripcionesList)
-                listPrescripcionesHoy.adapter = adapter
             },
             { error: VolleyError ->
                 // Manejo de errores
                 error.printStackTrace()
+                //Toast.makeText(context, "Error al obtener las prescripciones. Intente de nuevo.", Toast.LENGTH_SHORT).show()
             }
         ) {
             override fun getBody(): ByteArray {

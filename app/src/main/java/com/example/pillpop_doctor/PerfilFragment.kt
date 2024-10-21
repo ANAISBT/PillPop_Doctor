@@ -1,5 +1,6 @@
 package com.example.pillpop_doctor
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
@@ -11,7 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -21,6 +24,7 @@ class PerfilFragment : Fragment() {
     private lateinit var tvProfileOccupation: TextView
     private lateinit var progressDialog: ProgressDialog
     private lateinit var editarPerfilButton: ImageButton
+    private lateinit var btnAboutUs: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +32,27 @@ class PerfilFragment : Fragment() {
         }
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_perfil, container, false)
+
+        // Inicializa las vistas para cambiar contraseña
+        val aboutUsView: ImageView = view.findViewById(R.id.imageViewLogo)
+        val aboutUsViewText: TextView = view.findViewById(R.id.aboutUsText)
+
+        val aboutUsIntent = Intent(requireContext(), AcercaPillPop::class.java)
+
+        aboutUsView.setOnClickListener {
+            startActivity(aboutUsIntent)
+        }
+
+        aboutUsViewText.setOnClickListener {
+            startActivity(aboutUsIntent)
+        }
 
         // Inicializar el ProgressDialog
         progressDialog = ProgressDialog(requireContext())
@@ -124,12 +143,17 @@ class PerfilFragment : Fragment() {
             { error ->
                 // Manejar el error
                 Log.e("PerfilFragment", "Error: ${error.message}")
+                mostrarMensaje("Error al obtener los datos del doctor. Intenta nuevamente.")
                 progressDialog.dismiss()
             }
         )
 
         // Agregar la solicitud a la cola de Volley
         Volley.newRequestQueue(requireContext()).add(jsonRequest)
+    }
+
+    private fun mostrarMensaje(mensaje: String) {
+        Toast.makeText(requireContext(), mensaje, Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

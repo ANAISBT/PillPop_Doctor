@@ -66,6 +66,13 @@ class CambiarComtraseñaView  : AppCompatActivity() {
         // La URL de tu endpoint
         val url = "https://pillpop-backend.onrender.com/editarContrasenaDoctor/$id"
 
+        // Validar la nueva contraseña
+        if (nuevaContrasena.isBlank()) {
+            Toast.makeText(this, "La nueva contraseña no puede estar vacía.", Toast.LENGTH_SHORT).show()
+            progressDialog.dismiss()
+            return
+        }
+
         // Crear el objeto JSON para el cuerpo de la solicitud
         val jsonBody = JSONObject()
         jsonBody.put("p_contrasena", nuevaContrasena)
@@ -76,14 +83,14 @@ class CambiarComtraseñaView  : AppCompatActivity() {
             url,
             { response ->
                 // Manejar la respuesta del servidor
-                Toast.makeText(this, response, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Contraseña actualizada con éxito.", Toast.LENGTH_SHORT).show()
                 progressDialog.dismiss()
                 finish()
             },
             { error ->
                 // Manejar el error
                 Log.e("CambiarContrasenaView", "Error: ${error.message}")
-                Toast.makeText(this, "Error al actualizar la contraseña", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al actualizar la contraseña. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
                 progressDialog.dismiss()
             }
         ) {
@@ -105,6 +112,7 @@ class CambiarComtraseñaView  : AppCompatActivity() {
 
 
     private fun obtenerDatosDoctor() {
+        progressDialog.setMessage("Cargando datos del doctor...")
         progressDialog.show()
         val url = "https://pillpop-backend.onrender.com/obtenerDatosDoctor" // Cambia esto a tu URL base
 
@@ -140,6 +148,8 @@ class CambiarComtraseñaView  : AppCompatActivity() {
                 // Manejar el error
                 Log.e("CambiarContrasenaView", "Error: ${error.message}")
                 progressDialog.dismiss()
+                Toast.makeText(this, "Error al obtener los datos del doctor. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
+                finish()
             }
         )
 

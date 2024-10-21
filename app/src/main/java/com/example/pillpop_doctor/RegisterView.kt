@@ -90,6 +90,10 @@ class RegisterView: AppCompatActivity() {
     }
 
     private fun validarCampos(): Boolean {
+        return validarNombre() && validarDni() && validarEmail() && validarPassword() && validarGenero() && validarEspecialidad()
+    }
+
+    private fun validarNombre(): Boolean {
         val nombre = nombreInput.text.toString()
         if (nombre.isEmpty()) {
             nombreInput.error = "El nombre no puede estar vacío"
@@ -98,7 +102,10 @@ class RegisterView: AppCompatActivity() {
             nombreInput.error = "El nombre solo puede contener letras"
             return false
         }
+        return true
+    }
 
+    private fun validarDni(): Boolean {
         val dni = dniInput.text.toString()
         if (dni.isEmpty()) {
             dniInput.error = "El DNI no puede estar vacío"
@@ -107,7 +114,10 @@ class RegisterView: AppCompatActivity() {
             dniInput.error = "El DNI debe contener 8 dígitos numéricos"
             return false
         }
+        return true
+    }
 
+    private fun validarEmail(): Boolean {
         val email = emailInput.text.toString()
         if (email.isEmpty()) {
             emailInput.error = "El correo electrónico no puede estar vacío"
@@ -116,7 +126,10 @@ class RegisterView: AppCompatActivity() {
             emailInput.error = "Por favor ingresa un correo electrónico válido"
             return false
         }
+        return true
+    }
 
+    private fun validarPassword(): Boolean {
         val password = passwordInput.text.toString()
         if (password.isEmpty()) {
             passwordInput.error = "La contraseña no puede estar vacía"
@@ -125,24 +138,31 @@ class RegisterView: AppCompatActivity() {
             passwordInput.error = "La contraseña debe tener al menos 6 caracteres"
             return false
         }
+        return true
+    }
 
+    private fun validarGenero(): Boolean {
         val generoSeleccionado = spinnerGenero.selectedItem.toString()
         if (generoSeleccionado == "Seleccionar...") {
             Toast.makeText(this, "Por favor selecciona tu género", Toast.LENGTH_SHORT).show()
             return false
         }
+        return true
+    }
 
+    private fun validarEspecialidad(): Boolean {
         val especialidadSeleccionada = spinnerEspecialidad.selectedItem.toString()
         if (especialidadSeleccionada == "Seleccionar...") {
             Toast.makeText(this, "Por favor selecciona tu especialidad", Toast.LENGTH_SHORT).show()
             return false
         }
-
         return true
     }
 
+
     // Función para obtener los géneros usando Volley
     private fun loadGeneros() {
+
         progressDialog.show() // Mostrar el loader antes de hacer la petición
         val url = "https://pillpop-backend.onrender.com/getDataSexo"  // Reemplaza con la URL correcta
 
@@ -168,6 +188,9 @@ class RegisterView: AppCompatActivity() {
                     spinnerGenero.adapter = adapterGeneros
                 } catch (e: JSONException) {
                     e.printStackTrace()
+                    // Mostrar Toast y regresar a la vista anterior
+                    Toast.makeText(this, "Error al obtener los géneros", Toast.LENGTH_SHORT).show()
+                    finish()  // Regresa a la vista anterior
                 } finally {
                     progressDialog.dismiss() // Ocultar el loader cuando se complete la carga
                 }
@@ -175,7 +198,9 @@ class RegisterView: AppCompatActivity() {
             { error ->
                 // Manejo de errores
                 error.printStackTrace()
+                Toast.makeText(this, "Error al obtener los géneros", Toast.LENGTH_SHORT).show()
                 progressDialog.dismiss() // Ocultar el loader en caso de error
+                finish()  // Regresa a la vista anterior
             }
         )
 
@@ -210,6 +235,8 @@ class RegisterView: AppCompatActivity() {
                     spinnerEspecialidad.adapter = adapterEspecialidad
                 } catch (e: JSONException) {
                     e.printStackTrace()
+                    Toast.makeText(this, "Error al obtener las especialidades", Toast.LENGTH_SHORT).show()
+                    finish()  // Regresa a la vista anterior
                 } finally {
                     progressDialog.dismiss() // Ocultar el loader cuando se complete la carga
                 }
@@ -217,7 +244,9 @@ class RegisterView: AppCompatActivity() {
             { error ->
                 // Manejo de errores
                 error.printStackTrace()
+                Toast.makeText(this, "Error al obtener las especialidades", Toast.LENGTH_SHORT).show()
                 progressDialog.dismiss() // Ocultar el loader en caso de error
+                finish()  // Regresa a la vista anterior
             }
         )
 
@@ -249,13 +278,20 @@ class RegisterView: AppCompatActivity() {
                 // Manejar la respuesta exitosa
                 try {
                     val mensaje = response.getString("mensaje")
-                    doctorId = response.getInt("idUsuarioDoctor")
-                    Log.d("Registro", "$mensaje con ID: $idDoctor")
-                    // Redirigir al usuario a la vista de bienvenida
-                    val intent = Intent(this, BienvenidoView::class.java)
-                    startActivity(intent)
+                    doctorId = response.optInt("idUsuarioDoctor", -1)
+
+                    // Validar si el doctorId es válido
+                    if (doctorId != -1) {
+                        Log.d("Registro", "$mensaje con ID: $doctorId")
+                        // Redirigir al usuario a la vista de bienvenida
+                        val intent = Intent(this, BienvenidoView::class.java)
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this, "Error al obtener ID del doctor.", Toast.LENGTH_SHORT).show()
+                    }
                 } catch (e: JSONException) {
                     e.printStackTrace()
+                    Toast.makeText(this, "Error al procesar la respuesta.Intente de nuevo", Toast.LENGTH_SHORT).show()
                 }finally {
                     progressDialog2.dismiss() // Ocultar el loader cuando se complete la carga
                 }

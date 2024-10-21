@@ -204,6 +204,7 @@ class EditarPerfilView : AppCompatActivity() {
 
     // Función para obtener los géneros usando Volley
     private fun loadGeneros(listener: DataLoadListener) {
+        progressDialog.setMessage("Cargando géneros...")
         progressDialog.show()
         val url = "https://pillpop-backend.onrender.com/getDataSexo"
 
@@ -227,18 +228,24 @@ class EditarPerfilView : AppCompatActivity() {
                     listener.onDataLoaded() // Notifica que los datos se han cargado
                 } catch (e: JSONException) {
                     e.printStackTrace()
+                    Toast.makeText(this, "Error al obtener géneros. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
+                    finish()
                 } finally {
+                    progressDialog.dismiss()
                 }
             },
             { error ->
                 error.printStackTrace()
                 progressDialog.dismiss()
+                Toast.makeText(this, "Error al obtener géneros. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
+                finish()
             }
         )
         requestQueue.add(jsonArrayRequest)
     }
 
     private fun loadEspecialidades(listener: DataLoadListener) {
+        progressDialog.setMessage("Cargando especialidades...")
         progressDialog.show()
         val url = "https://pillpop-backend.onrender.com/getDataEspecialidades"
 
@@ -261,12 +268,17 @@ class EditarPerfilView : AppCompatActivity() {
                     listener.onDataLoaded() // Notifica que los datos se han cargado
                 } catch (e: JSONException) {
                     e.printStackTrace()
+                    Toast.makeText(this, "Error al obtener especialidades. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
+                    finish()
                 } finally {
+                    progressDialog.dismiss()
                 }
             },
             { error ->
                 error.printStackTrace()
                 progressDialog.dismiss()
+                Toast.makeText(this, "Error al obtener especialidades. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
+                finish()
             }
         )
         requestQueue.add(jsonArrayRequest)
@@ -297,11 +309,13 @@ class EditarPerfilView : AppCompatActivity() {
                 try {
                     val mensaje = response.getString("mensaje")
                     Log.d("Registro", "$mensaje con ID: $doctorId")
+
                     // Cerrar la actividad actual
                     setResult(Activity.RESULT_OK) // Establece el resultado de la actividad
                     finish()
                 } catch (e: JSONException) {
                     e.printStackTrace()
+                    Toast.makeText(this, "Error al actualizar la información del doctor. Intenta nuevamente.", Toast.LENGTH_SHORT).show()
                 } finally {
                     progressDialog2.dismiss() // Ocultar el loader cuando se complete la carga
                 }
