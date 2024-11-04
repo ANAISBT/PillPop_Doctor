@@ -518,6 +518,7 @@ class ProgresoFragment : Fragment() {
                         val item = tomasDiariasList.getJSONObject(i)
                         val tomaDiaria = TomaDiaria(
                             fecha_toma = item.getString("fecha_toma"),
+                            fecha_tomada = item.getString("fecha_tomada"),
                             toma = item.getInt("toma"),
                             id = item.getInt("id"),
                             nombre = item.getString("nombre")
@@ -734,7 +735,7 @@ class ProgresoFragment : Fragment() {
         val nombresPastillas = registros2.map { it.nombre }.distinct()
 
 // Crear registroTitulos dinámicamente
-        val registroTitulos = arrayOf("Fecha") + nombresPastillas.toTypedArray()
+        val registroTitulos = arrayOf("Fecha Indicada","Fecha Tomada") + nombresPastillas.toTypedArray()
 
 // Imprimir el resultado
         println(registroTitulos.joinToString(", "))
@@ -757,21 +758,29 @@ class ProgresoFragment : Fragment() {
 
         for ((fecha, tomas) in tomasAgrupadasPorFecha) {
             // Inicializar una fila para la fecha actual
-            val fila = Array(nombresPastillas.size + 1) { "" }
+            val fila = Array(nombresPastillas.size + 2) { "" }
             // Parsear la fecha y formatearla
             val parsedDate: Date? = inputFormat.parse(fecha)
 
             // Asegúrate de que la fecha se haya parseado correctamente
-            if (parsedDate != null) {
-                fila[0] = outputFormat.format(parsedDate) // Asignar fecha formateada a la primera columna
+            if (fecha != null) {
+                fila[0] = formatFecha(fecha) // Asignar fecha formateada a la primera columna
             } else {
-                fila[0] = "Fecha no válida" // Manejo de error si la fecha no se parsea
+                fila[0] = "" // Manejo de error si la fecha no se parsea
             }
 
 
             // Llenar las columnas de pastillas
             for (toma in tomas) {
-                val indice = nombresPastillas.indexOf(toma.nombre) + 1 // +1 para ignorar la columna de fecha
+                if(toma.fecha_tomada==null){
+                    val fechaFormateada=""
+                    fila[1]=fechaFormateada
+                }else{
+                    val fechaFormateada = formatFecha(toma.fecha_tomada)
+                    fila[1]=fechaFormateada
+                }
+
+                val indice = nombresPastillas.indexOf(toma.nombre) + 2 // +1 para ignorar la columna de fecha
                 if (indice > 0) {
                     fila[indice] = if (toma.toma == 1) "✔" else "✖"
                 }
@@ -822,6 +831,22 @@ class ProgresoFragment : Fragment() {
         pdfDocument.close()
     }
 
+    fun formatFecha(fechaOriginal: String): String {
+        // Define el formato de entrada (ISO 8601) en UTC
+        val formatoEntrada = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        formatoEntrada.timeZone = TimeZone.getTimeZone("UTC")
+
+        // Define el formato de salida en 12 horas con AM/PM en UTC, sin los segundos
+        val formatoSalida = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault())
+        formatoSalida.timeZone = TimeZone.getTimeZone("UTC")
+
+        // Convierte la fecha de entrada en objeto Date y luego al formato deseado
+        val fecha = formatoEntrada.parse(fechaOriginal)
+        val fechaFormateada = formatoSalida.format(fecha!!)
+
+        // Cambia AM/PM a formato en minúsculas con puntos
+        return fechaFormateada.replace("AM", "a.m.").replace("PM", "p.m.")
+    }
     fun drawMultilineText(canvas: Canvas, text: String, x: Float, y: Float, paint: TextPaint, maxWidth: Float) {
         val words = text.split(" ")
         var line = ""

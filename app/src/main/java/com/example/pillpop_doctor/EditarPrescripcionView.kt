@@ -126,12 +126,14 @@ class EditarPrescripcionView : AppCompatActivity() {
         // Validación adicional
         if (dni.isEmpty() && nombreCompleto.isEmpty()) {
             Toast.makeText(this, "Por favor busque al paciente", Toast.LENGTH_SHORT).show()
+            progressDialog3.dismiss()
             return
         }
 
         // Validar que al menos se haya agregado una pastilla
         if (pastillasList.isEmpty()) {
             Toast.makeText(this, "Debes agregar al menos una pastilla", Toast.LENGTH_SHORT).show()
+            progressDialog3.dismiss()
             return // Detener la ejecución si no hay pastillas
         }
 

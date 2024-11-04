@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +32,7 @@ class LoginView : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var btnRegistrarUsuario: TextView
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var toggleIcon: ImageView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,7 @@ class LoginView : AppCompatActivity() {
 
         edtDni = findViewById(R.id.DNIInput)
         edtContrasena = findViewById(R.id.TextPasswordInput)
+        toggleIcon = findViewById(R.id.PasswordToggleIcon)
         btnLogin = findViewById(R.id.IniciarSesionBtn)
         btnRegistrarUsuario = findViewById(R.id.btnRegistrarUsuario)
 
@@ -60,6 +64,20 @@ class LoginView : AppCompatActivity() {
         btnRegistrarUsuario.setOnClickListener{
             val intent = Intent(this, RegisterView::class.java)
             startActivity(intent)
+        }
+
+        toggleIcon.setOnClickListener {
+            if (edtContrasena.inputType == (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                // Show Password
+                edtContrasena.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                toggleIcon.setImageResource(R.drawable.baseline_visibility_24) // Use "visible" icon
+            } else {
+                // Hide Password
+                edtContrasena.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                toggleIcon.setImageResource(R.drawable.baseline_visibility_off_24) // Use "hidden" icon
+            }
+            // Move the cursor to the end of the text
+            edtContrasena.setSelection(edtContrasena.length())
         }
     }
 
